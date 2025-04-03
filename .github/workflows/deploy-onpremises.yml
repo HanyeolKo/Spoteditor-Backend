@@ -46,9 +46,9 @@ jobs:
 
       - name: 온프레미스 배포 트리거
         run: |
-          aws deploy create-deployment
-            --application-name spoteditor
-            --deployment-config-name CodeDeployDefault.AllAtOnce
-            --deployment-group-name spoteditor-onpremise
-            --s3-location bucket=spoteditor-develop-s3,bundleType=tgz,key=$GITHUB_SHA.tar.gz
+          aws deploy create-deployment \
+            --application-name spoteditor \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --deployment-group-name SpotEditor-Dev \
+            --s3-location bucket=spoteditor-develop-s3,bundleType=tgz,key=$GITHUB_SHA.tar.gz \
             --region ap-northeast-2
