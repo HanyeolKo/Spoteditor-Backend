@@ -38,8 +38,11 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_ONPREMISES }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ONPREMISES }}
 
+      - name: 압축 대상 파일 권한 spoteditor로 변경 # 권한 오류 방지용
+        run: sudo chown -R spoteditor:spoteditor spoteditor.jar appspec.yml scripts Dockerfile docker-compose.yml nginx conf
+
       - name: 압축 생성
-        run: tar -czvf $GITHUB_SHA.tar.gz spoteditor.jar appspec.yml scripts Dockerfile docker-compose.yml nginx
+        run: tar -czvf $GITHUB_SHA.tar.gz spoteditor.jar appspec.yml scripts Dockerfile docker-compose.yml nginx conf
 
       - name: S3 업로드
         run: aws s3 cp $GITHUB_SHA.tar.gz s3://spoteditor-develop-s3/$GITHUB_SHA.tar.gz
