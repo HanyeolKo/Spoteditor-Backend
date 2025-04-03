@@ -17,3 +17,7 @@ hooks:
     - location: scripts/start.sh
       timeout: 180
       runas: spoteditor
+
+  BeforeInstall:  # 설치전 디렉토리 클린
+    - location: scripts/directory_clean.sh
+      runas: spoteditor
