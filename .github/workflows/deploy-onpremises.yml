@@ -1,0 +1,54 @@
+name: Deploy to OnPremises Server
+
+on:
+  push:
+    branches:
+      - dev-onpremises
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: application.yml 생성
+        run: echo "${{ secrets.APPLICATION_YML_ONPREMISES }}" > ./src/main/resources/application.yml
+
+      - name: 실행 권한 부여하기
+        run: chmod +x ./gradlew
+
+      - name: Gradle build
+        run: ./gradlew clean build -x test
+
+      - name: Rename built JAR
+        run: mv ./build/libs/*SNAPSHOT.jar ./spoteditor.jar
+
+      - name: AWS credentials 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-northeast-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_ONPREMISES }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ONPREMISES }}
+
+      - name: 압축 생성
+        run: tar -czvf $GITHUB_SHA.tar.gz spoteditor.jar appspec.yml scripts Dockerfile docker-compose.yml nginx
+
+      - name: S3 업로드
+        run: aws s3 cp $GITHUB_SHA.tar.gz s3://spoteditor-develop-s3/$GITHUB_SHA.tar.gz
+
+      - name: 온프레미스 배포 트리거
+        run: |
+          aws deploy create-deployment
+            --application-name spoteditor
+            --deployment-config-name CodeDeployDefault.AllAtOnce
+            --deployment-group-name spoteditor-onpremise
+            --s3-location bucket=spoteditor-develop-s3,bundleType=tgz,key=$GITHUB_SHA.tar.gz
+            --region ap-northeast-2
