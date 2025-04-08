@@ -8,6 +8,9 @@ services:
       - redis-cluster-compose
     image: rabbitmq:management-alpine
     container_name: rabbit-mq-container
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     hostname: rabbitmq
     ports:
       - "5672:5672"
@@ -25,6 +28,8 @@ services:
     container_name: redis-test1
     volumes:
       - ./conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     command: redis-server /usr/local/etc/redis/redis.conf
     healthcheck:
       test: ["CMD", "sh", "-c", "redis-cli -h redis-node-1 -p 6379 ping"]
@@ -42,6 +47,8 @@ services:
     container_name: redis-test2
     volumes:
       - ./conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     command: redis-server /usr/local/etc/redis/redis.conf
     healthcheck:
       test: ["CMD", "sh", "-c", "redis-cli -h redis-node-2 -p 6379 ping"]
@@ -59,6 +66,8 @@ services:
     container_name: redis-test3
     volumes:
       - ./conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     command: redis-server /usr/local/etc/redis/redis.conf
     healthcheck:
       test: ["CMD", "sh", "-c", "redis-cli -h redis-node-3 -p 6379 ping"]
@@ -76,6 +85,8 @@ services:
     container_name: redis-slave-test1
     volumes:
       - ./conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     command: redis-server /usr/local/etc/redis/redis.conf
     healthcheck:
       test: ["CMD", "sh", "-c", "redis-cli -h slave-node-1 -p 6379 ping"]
@@ -93,6 +104,8 @@ services:
     container_name: redis-slave-test2
     volumes:
       - ./conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     command: redis-server /usr/local/etc/redis/redis.conf
     healthcheck:
       test: ["CMD", "sh", "-c", "redis-cli -h slave-node-2 -p 6379 ping"]
@@ -110,6 +123,8 @@ services:
     container_name: redis-slave-test3
     volumes:
       - ./conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     command: redis-server /usr/local/etc/redis/redis.conf
     healthcheck:
       test: ["CMD", "sh", "-c", "redis-cli -h slave-node-3 -p 6379 ping"]
@@ -139,6 +154,9 @@ services:
     build: .
     networks:
       - redis-cluster-compose
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     expose:
       - "8080"
     depends_on:
@@ -159,6 +177,9 @@ services:
     build: .
     networks:
       - redis-cluster-compose
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     expose:
       - "8080"
     depends_on:
@@ -184,6 +205,8 @@ services:
     volumes:
       - ./nginx/conf:/etc/nginx/conf.d     # 예: default.conf
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     depends_on:
       - spring-1
       - spring-2
