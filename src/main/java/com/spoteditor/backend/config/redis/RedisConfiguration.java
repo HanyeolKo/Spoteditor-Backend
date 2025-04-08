@@ -6,6 +6,11 @@ import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @RequiredArgsConstructor
@@ -24,5 +29,15 @@ public class RedisConfiguration {
 				.addNodeAddress(nodes);
 
 		return Redisson.create(config);
+	}
+
+	// oauth2 인증을 위한 레디스 클러스터 저장 규격
+	@Bean
+	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+		RedisTemplate<String, Object> template = new RedisTemplate<>();
+		template.setConnectionFactory(redisConnectionFactory);
+		template.setKeySerializer(new StringRedisSerializer());
+		template.setValueSerializer(new JdkSerializationRedisSerializer());
+		return template;
 	}
 }
