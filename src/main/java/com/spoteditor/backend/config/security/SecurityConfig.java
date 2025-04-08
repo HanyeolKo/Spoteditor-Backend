@@ -1,23 +1,25 @@
 package com.spoteditor.backend.config.security;
 
-import com.spoteditor.backend.config.util.CookieUtils;
 import com.spoteditor.backend.config.jwt.JwtFilter;
 import com.spoteditor.backend.config.jwt.JwtUtils;
 import com.spoteditor.backend.config.oauth.handler.OauthFailureHandler;
 import com.spoteditor.backend.config.oauth.handler.OauthSuccessHandler;
 import com.spoteditor.backend.config.oauth.service.CustomOauthUserService;
+import com.spoteditor.backend.config.oauth.service.RedisOAuth2AuthorizationRequestRepository;
+import com.spoteditor.backend.config.util.CookieUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -25,6 +27,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     private final CustomOauthUserService customOauthUserService;
+    
+    // OAuth 처리 핸들러
     private final OauthSuccessHandler oauthSuccessHandler;
     private final OauthFailureHandler oauthFailureHandler;
 
@@ -34,7 +38,16 @@ public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> redisAuthorizationRequestRepository(RedisTemplate<String, Object> redisTemplate) {
+        return new RedisOAuth2AuthorizationRequestRepository(redisTemplate);
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           AuthorizationRequestRepository<OAuth2AuthorizationRequest> authRequestRespsitory,
+                                           OauthSuccessHandler successHandler,
+                                           OauthFailureHandler failureHandler) throws Exception {
+
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .formLogin(AbstractHttpConfigurer::disable)
@@ -44,14 +57,17 @@ public class SecurityConfig {
             )
             .addFilterBefore(new JwtFilter(jwtUtils, cookieUtils), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/**").permitAll()
-                .anyRequest().authenticated()
+                    .requestMatchers("/**").permitAll()
+                    .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2
-                .userInfoEndpoint(userInfoEndpointConfig
-                    -> userInfoEndpointConfig.userService(customOauthUserService))
-                .successHandler(oauthSuccessHandler)
-                .failureHandler(oauthFailureHandler)
+                    // LB분산 서버 처리, oauth 요청 처리를 위한 요청 저장 repository
+                    .authorizationEndpoint(endpoint ->
+                            endpoint.authorizationRequestRepository(authRequestRespsitory))
+                    .userInfoEndpoint(userInfoEndpointConfig ->
+                            userInfoEndpointConfig.userService(customOauthUserService))
+                    .successHandler(oauthSuccessHandler)
+                    .failureHandler(oauthFailureHandler)
             );
 
         return http.build();
