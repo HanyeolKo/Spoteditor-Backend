@@ -4,18 +4,19 @@ import com.spoteditor.backend.config.jwt.JwtFilter;
 import com.spoteditor.backend.config.jwt.JwtUtils;
 import com.spoteditor.backend.config.oauth.handler.OauthFailureHandler;
 import com.spoteditor.backend.config.oauth.handler.OauthSuccessHandler;
+import com.spoteditor.backend.config.oauth.service.CustomOAuth2AuthorizationRequestResolver;
 import com.spoteditor.backend.config.oauth.service.CustomOauthUserService;
-import com.spoteditor.backend.config.oauth.service.RedisOAuth2AuthorizationRequestRepository;
 import com.spoteditor.backend.config.util.CookieUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -32,15 +33,14 @@ public class SecurityConfig {
     private final OauthSuccessHandler oauthSuccessHandler;
     private final OauthFailureHandler oauthFailureHandler;
 
+    private final ClientRegistrationRepository clientRegistrationRepository;
+    private final AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
+
     private final JwtUtils jwtUtils;
     private final CookieUtils cookieUtils;
 
     private final CorsConfigurationSource corsConfigurationSource;
 
-    @Bean
-    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> redisAuthorizationRequestRepository(RedisTemplate<String, Object> redisTemplate) {
-        return new RedisOAuth2AuthorizationRequestRepository(redisTemplate);
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
@@ -62,8 +62,13 @@ public class SecurityConfig {
             )
             .oauth2Login(oauth2 -> oauth2
                     // LB분산 서버 처리, oauth 요청 처리를 위한 요청 저장 repository
-                    .authorizationEndpoint(endpoint ->
-                            endpoint.authorizationRequestRepository(authRequestRespsitory))
+                    .authorizationEndpoint(auth -> auth
+                            .authorizationRequestResolver(new CustomOAuth2AuthorizationRequestResolver(
+                                    clientRegistrationRepository,
+                                    OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI
+                                )
+                            )
+                            .authorizationRequestRepository(authRequestRespsitory))
                     .userInfoEndpoint(userInfoEndpointConfig ->
                             userInfoEndpointConfig.userService(customOauthUserService))
                     .successHandler(oauthSuccessHandler)
