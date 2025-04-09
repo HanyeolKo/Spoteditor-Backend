@@ -37,7 +37,15 @@ public class RedisConfiguration {
 		RedisTemplate<String, Object> template = new RedisTemplate<>();
 		template.setConnectionFactory(redisConnectionFactory);
 		template.setKeySerializer(new StringRedisSerializer());
-		template.setValueSerializer(new JdkSerializationRedisSerializer());
+
+		// JSON 직렬화 방식 사용
+		// jdk 직렬화 방식보다 권장됨
+		GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer();
+		template.setValueSerializer(serializer);
+		template.setHashValueSerializer(serializer);
+
+		template.afterPropertiesSet();
+		//template.setValueSerializer(new JdkSerializationRedisSerializer());
 		return template;
 	}
 }
