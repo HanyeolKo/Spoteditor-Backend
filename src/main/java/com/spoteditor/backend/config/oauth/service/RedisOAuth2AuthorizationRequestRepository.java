@@ -63,7 +63,9 @@ public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationR
          */
         // cookie에 redirect uri 저장
         // success handler에서 사용후 지워주기 혹은 방치
-        String redirect = authorizationRequest.getAdditionalParameters().get(OAUTH2_REQUEST_PARAM).toString();
+        String redirect = Optional.ofNullable(authorizationRequest.getAdditionalParameters().get(OAUTH2_REQUEST_PARAM))
+                .map(Object::toString)
+                .orElse("");
 
         Cookie redirectCookie = new Cookie(REDIRECT_COOKIE, redirect);
         redirectCookie.setPath("/");
