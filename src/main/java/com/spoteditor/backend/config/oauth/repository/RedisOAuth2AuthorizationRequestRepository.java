@@ -1,4 +1,4 @@
-package com.spoteditor.backend.config.oauth.service;
+package com.spoteditor.backend.config.oauth.repository;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +12,7 @@ import org.springframework.web.util.WebUtils;
 
 import java.util.*;
 
-import static com.spoteditor.backend.config.oauth.constract.OAuthConstants.*;
+import static com.spoteditor.backend.config.oauth.constants.OAuthConstants.*;
 
 /**
  *      로드밸런서를 사용하면서 OAuth2.0 인증과정에서 요청과 리다이렉트를 각각 다른 서버에서 처리하는 이슈 발생

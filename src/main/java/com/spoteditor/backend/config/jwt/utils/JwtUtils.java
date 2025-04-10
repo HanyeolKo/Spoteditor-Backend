@@ -1,6 +1,7 @@
-package com.spoteditor.backend.config.jwt;
+package com.spoteditor.backend.config.jwt.utils;
 
-import com.spoteditor.backend.global.exception.TokenException;
+import com.spoteditor.backend.config.jwt.JwtProperties;
+import com.spoteditor.backend.config.jwt.constants.JwtConstants;
 import com.spoteditor.backend.user.common.dto.UserIdDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;

@@ -1,4 +1,4 @@
-package com.spoteditor.backend.config.oauth.service;
+package com.spoteditor.backend.config.oauth.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -9,7 +9,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.spoteditor.backend.config.oauth.constract.OAuthConstants.OAUTH2_REQUEST_PARAM;
+import static com.spoteditor.backend.config.oauth.constants.OAuthConstants.OAUTH2_REQUEST_PARAM;
 
 public class CustomOAuth2AuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
 

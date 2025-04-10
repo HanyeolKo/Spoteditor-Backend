@@ -1,4 +1,4 @@
-package com.spoteditor.backend.config.jwt;
+package com.spoteditor.backend.config.jwt.constants;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.MacAlgorithm;
