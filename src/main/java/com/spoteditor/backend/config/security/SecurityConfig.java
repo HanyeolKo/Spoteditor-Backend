@@ -10,6 +10,7 @@ import com.spoteditor.backend.config.util.CookieUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -28,13 +29,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfig {
 
     private final CustomOauthUserService customOauthUserService;
-    
-    // OAuth 처리 핸들러
-    private final OauthSuccessHandler oauthSuccessHandler;
-    private final OauthFailureHandler oauthFailureHandler;
+
 
     private final ClientRegistrationRepository clientRegistrationRepository;
-    private final AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
 
     private final JwtUtils jwtUtils;
     private final CookieUtils cookieUtils;
@@ -57,6 +54,7 @@ public class SecurityConfig {
             )
             .addFilterBefore(new JwtFilter(jwtUtils, cookieUtils), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authorize -> authorize
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/**").permitAll()
                     .anyRequest().authenticated()
             )
@@ -71,8 +69,8 @@ public class SecurityConfig {
                             .authorizationRequestRepository(authRequestRespsitory))
                     .userInfoEndpoint(userInfoEndpointConfig ->
                             userInfoEndpointConfig.userService(customOauthUserService))
-                    .successHandler(oauthSuccessHandler)
-                    .failureHandler(oauthFailureHandler)
+                    .successHandler(successHandler)
+                    .failureHandler(failureHandler)
             );
 
         return http.build();
