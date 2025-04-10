@@ -27,12 +27,15 @@ public class WebConfiguration implements WebMvcConfigurer {
 
 		corsConfiguration.setAllowCredentials(true);
 		corsConfiguration.setAllowedOrigins(corsProperties.getAllowedOrigins());
-		corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-		corsConfiguration.setAllowedHeaders(List.of("*"));
-		corsConfiguration.setExposedHeaders(List.of("Set-Cookie", "*"));
 
-		corsConfiguration.addAllowedHeader("*");
-		corsConfiguration.addAllowedMethod("*");
+		// 허용할 메서드
+		corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+
+		// 허용할 헤더
+		corsConfiguration.setAllowedHeaders(List.of("*"));
+		
+		// 노출할 헤더
+		corsConfiguration.setExposedHeaders(List.of("Set-Cookie"));
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", corsConfiguration);
