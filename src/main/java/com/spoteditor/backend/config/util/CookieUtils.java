@@ -1,6 +1,6 @@
 package com.spoteditor.backend.config.util;
 
-import com.spoteditor.backend.config.jwt.JwtConstants;
+import com.spoteditor.backend.config.jwt.constants.JwtConstants;
 import com.spoteditor.backend.config.jwt.JwtProperties;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,8 +1,8 @@
 package com.spoteditor.backend.config.oauth.handler;
 
-import com.spoteditor.backend.config.jwt.JwtConstants;
-import com.spoteditor.backend.config.jwt.JwtUtils;
-import com.spoteditor.backend.config.oauth.constract.OAuthConstants;
+import com.spoteditor.backend.config.jwt.constants.JwtConstants;
+import com.spoteditor.backend.config.jwt.utils.JwtUtils;
+import com.spoteditor.backend.config.oauth.constants.OAuthConstants;
 import com.spoteditor.backend.config.util.CookieUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import static com.spoteditor.backend.config.oauth.constract.OAuthConstants.REDIRECT_COOKIE;
+import static com.spoteditor.backend.config.oauth.constants.OAuthConstants.REDIRECT_COOKIE;
 
 @Component
 @RequiredArgsConstructor

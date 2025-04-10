@@ -1,6 +1,6 @@
 package com.spoteditor.backend.config.oauth.config;
 
-import com.spoteditor.backend.config.oauth.service.RedisOAuth2AuthorizationRequestRepository;
+import com.spoteditor.backend.config.oauth.repository.RedisOAuth2AuthorizationRequestRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;

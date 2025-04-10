@@ -1,7 +1,8 @@
-package com.spoteditor.backend.config.jwt;
+package com.spoteditor.backend.config.jwt.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.spoteditor.backend.config.jwt.utils.JwtUtils;
 import com.spoteditor.backend.config.util.CookieUtils;
 import com.spoteditor.backend.global.exception.TokenException;
 import com.spoteditor.backend.global.response.ErrorCode;
@@ -23,6 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
+import static com.spoteditor.backend.config.jwt.constants.JwtWhiteList.*;
 import static com.spoteditor.backend.global.response.ErrorCode.INVALID_ACCESS_TOKEN;
 
 @RequiredArgsConstructor
@@ -31,28 +33,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
     private final CookieUtils cookieUtils;
-
-    private static final List<String> ALL_METHOD_WHITE_LIST = List.of(
-            "/error",
-            "/api/auth/**"
-    );
-
-    private static final List<String> GET_METHOD_WHITE_LIST = List.of(
-            "/favicon.ico",
-            "/api/health",
-            "/api/docs/**",
-            "/v3/api-docs",
-            "/v3/api-docs/**",
-            "/swagger-ui.html",
-            "/swagger-ui/**",
-            "/api/placelogs",
-            "/api/search/placelogs/**"
-    );
-
-    private static final List<String> GUEST_WHITE_LIST = List.of(
-            "/api/placelogs/**",
-            "/api/users/**"
-    );
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {

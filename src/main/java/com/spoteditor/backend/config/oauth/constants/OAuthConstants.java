@@ -1,4 +1,4 @@
-package com.spoteditor.backend.config.oauth.constract;
+package com.spoteditor.backend.config.oauth.constants;
 
 import java.time.Duration;
 import java.util.List;
