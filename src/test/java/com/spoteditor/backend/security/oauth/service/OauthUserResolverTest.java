@@ -1,10 +1,8 @@
 package com.spoteditor.backend.security.oauth.service;
 
-import com.spoteditor.backend.config.oauth.service.OauthUserResolver;
 import com.spoteditor.backend.user.entity.User;
-import com.spoteditor.backend.user.entity.OauthProvider;
+import com.spoteditor.backend.user.entity.Provider;
 import com.spoteditor.backend.user.repository.UserRepository;
-import com.spoteditor.backend.config.oauth.dto.OauthAttributes;
 import com.spoteditor.backend.config.oauth.dto.OauthAttributesUserMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,7 +46,7 @@ class OauthUserResolverTest {
 
         // then
         assertNotNull(createdUserId);
-        Optional<User> savedUser = userRepository.findByOauthUserIdAndProvider("9876543210", OauthProvider.KAKAO);
+        Optional<User> savedUser = userRepository.findByOauthUserIdAndProvider("9876543210", Provider.KAKAO);
         assertThat(savedUser).isPresent();
         User user = savedUser.get();
         assertThat(user.getId()).isEqualTo(createdUserId);
@@ -66,7 +64,7 @@ class OauthUserResolverTest {
                 .email("existinguser@kakao.com")
                 .name("기존유저")
                 .imageUrl("http://example.com/existinguser.jpg")
-                .provider(OauthProvider.KAKAO)
+                .provider(Provider.KAKAO)
                 .build();
         userRepository.save(existingUser);
 

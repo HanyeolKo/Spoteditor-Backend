@@ -1,8 +1,7 @@
 package com.spoteditor.backend.security.oauth.dto;
 
-import com.spoteditor.backend.config.oauth.dto.OauthAttributes;
 import com.spoteditor.backend.global.exception.UserException;
-import com.spoteditor.backend.user.entity.OauthProvider;
+import com.spoteditor.backend.user.entity.Provider;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,7 +61,7 @@ class OauthAttributesTest {
         Assertions.assertThat(attribute.getName()).isEqualTo("테스트유저");
         Assertions.assertThat(attribute.getEmail()).isEqualTo("testuser@kakao.com");
         Assertions.assertThat(attribute.getImageUrl()).isEqualTo("http://example.com/profile.jpg");
-        Assertions.assertThat(attribute.getProvider()).isEqualTo(OauthProvider.KAKAO);
+        Assertions.assertThat(attribute.getProvider()).isEqualTo(Provider.KAKAO);
     }
 
     @Test
