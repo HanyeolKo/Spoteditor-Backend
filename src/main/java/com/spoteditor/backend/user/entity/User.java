@@ -4,7 +4,6 @@ import com.spoteditor.backend.global.common.BaseEntity;
 import com.spoteditor.backend.image.entity.PlaceImage;
 import com.spoteditor.backend.mapping.userplacelogmapping.entity.UserPlaceLogMapping;
 import com.spoteditor.backend.place.entity.Place;
-import com.spoteditor.backend.user.service.dto.UserUpdateCommand;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -50,28 +49,33 @@ public class User extends BaseEntity {
     @Column(name = "instagram_id")
     private String instagramId;
 
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(value = EnumType.STRING)    // 사용자/관리자
     @Column(name = "role")
-    private UserRole role;
+    private Role role;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "provider")
-    private OauthProvider provider;
+    @Column(name = "provider")              // 제공자
+    private String provider;
 
-    @Column(name = "oauth_user_id")
-    private String oauthUserId;
+    @Column(name = "provider_id")           // 고유 ID
+    private String providerId;
 
     @Column(name = "is_deleted")
     private boolean isDeleted = false;
 
     @Builder
-    private User(String email, String name, String imageUrl, OauthProvider provider, String oauthUserId, UserRole role) {
+    private User(String email, String name, String imageUrl, String provider, String providerId, Role role) {
         this.email = email;
         this.name = name;
         this.imageUrl = imageUrl;
         this.provider = provider;
-        this.oauthUserId = oauthUserId;
+        this.providerId = providerId;
         this.role = role;
+    }
+
+    // 통합 로그인을 위한 이메일 업데이트 메서드
+    public void updateOauthInfo(String provider, String providerId) {
+        this.provider = provider;
+        this.providerId = providerId;
     }
 
     public void update(String name, String description, String instagramId) {

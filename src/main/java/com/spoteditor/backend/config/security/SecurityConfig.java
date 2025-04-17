@@ -5,7 +5,7 @@ import com.spoteditor.backend.config.jwt.utils.JwtUtils;
 import com.spoteditor.backend.config.oauth.handler.OauthFailureHandler;
 import com.spoteditor.backend.config.oauth.handler.OauthSuccessHandler;
 import com.spoteditor.backend.config.oauth.resolver.CustomOAuth2AuthorizationRequestResolver;
-import com.spoteditor.backend.config.oauth.service.CustomOauthUserService;
+import com.spoteditor.backend.config.oauth.service.PrincipalOauth2UserService;
 import com.spoteditor.backend.config.util.CookieUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -28,9 +28,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomOauthUserService customOauthUserService;
-
-
+    private final PrincipalOauth2UserService principalOauth2UserService;
     private final ClientRegistrationRepository clientRegistrationRepository;
 
     private final JwtUtils jwtUtils;
@@ -68,7 +66,7 @@ public class SecurityConfig {
                             )
                             .authorizationRequestRepository(authRequestRespsitory))
                     .userInfoEndpoint(userInfoEndpointConfig ->
-                            userInfoEndpointConfig.userService(customOauthUserService))
+                            userInfoEndpointConfig.userService(principalOauth2UserService))
                     .successHandler(successHandler)
                     .failureHandler(failureHandler)
             );
