@@ -1,12 +1,12 @@
 package com.spoteditor.backend.bookmark.service;
 
-import com.spoteditor.backend.bookmark.repository.BookmarkRepository;
-import com.spoteditor.backend.bookmark.service.dto.BookmarkCommand;
-import com.spoteditor.backend.bookmark.service.facade.BookmarkFacade;
-import com.spoteditor.backend.place.entity.Place;
-import com.spoteditor.backend.place.repository.PlaceRepository;
-import com.spoteditor.backend.user.entity.User;
-import com.spoteditor.backend.user.repository.UserRepository;
+import com.spoteditor.backend.modules.bookmark.repository.BookmarkRepository;
+import com.spoteditor.backend.modules.bookmark.service.dto.BookmarkCommand;
+import com.spoteditor.backend.modules.bookmark.service.facade.BookmarkFacade;
+import com.spoteditor.backend.modules.place.entity.Place;
+import com.spoteditor.backend.modules.place.repository.PlaceRepository;
+import com.spoteditor.backend.modules.user.entity.User;
+import com.spoteditor.backend.modules.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

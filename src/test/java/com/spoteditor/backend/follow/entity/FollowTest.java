@@ -1,8 +1,9 @@
 package com.spoteditor.backend.follow.entity;
 
 import com.spoteditor.backend.global.exception.FollowException;
-import com.spoteditor.backend.user.entity.User;
-import com.spoteditor.backend.user.repository.UserRepository;
+import com.spoteditor.backend.modules.follow.entity.Follow;
+import com.spoteditor.backend.modules.user.entity.User;
+import com.spoteditor.backend.modules.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

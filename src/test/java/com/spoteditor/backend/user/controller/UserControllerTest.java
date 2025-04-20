@@ -2,11 +2,12 @@ package com.spoteditor.backend.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spoteditor.backend.config.TestSecurityConfig;
-import com.spoteditor.backend.user.entity.User;
-import com.spoteditor.backend.user.service.UserService;
-import com.spoteditor.backend.user.service.dto.UserResult;
-import com.spoteditor.backend.user.service.dto.UserUpdateCommand;
-import com.spoteditor.backend.user.service.dto.UserUpdateResult;
+import com.spoteditor.backend.modules.user.controller.UserController;
+import com.spoteditor.backend.modules.user.entity.User;
+import com.spoteditor.backend.modules.user.service.UserService;
+import com.spoteditor.backend.modules.user.service.dto.UserResult;
+import com.spoteditor.backend.modules.user.service.dto.UserUpdateCommand;
+import com.spoteditor.backend.modules.user.service.dto.UserUpdateResult;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

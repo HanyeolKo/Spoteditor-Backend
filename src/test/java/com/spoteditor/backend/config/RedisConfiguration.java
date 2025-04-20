@@ -1,6 +1,6 @@
 package com.spoteditor.backend.config;
 
-import com.spoteditor.backend.config.redis.RedisProperties;
+import com.spoteditor.backend.infrastructure.redis.RedisProperties;
 import lombok.RequiredArgsConstructor;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;

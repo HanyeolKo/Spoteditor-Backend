@@ -1,13 +1,13 @@
 package com.spoteditor.backend.follow.service;
 
-import com.spoteditor.backend.follow.controller.dto.FollowRequest;
-import com.spoteditor.backend.follow.repository.FollowRepository;
-import com.spoteditor.backend.follow.service.facade.FollowFacade;
+import com.spoteditor.backend.modules.follow.controller.dto.FollowRequest;
+import com.spoteditor.backend.modules.follow.repository.FollowRepository;
+import com.spoteditor.backend.modules.follow.service.facade.FollowFacade;
 import com.spoteditor.backend.global.exception.FollowException;
-import com.spoteditor.backend.notification.repository.NotificationRepository;
-import com.spoteditor.backend.user.common.dto.UserIdDto;
-import com.spoteditor.backend.user.entity.User;
-import com.spoteditor.backend.user.repository.UserRepository;
+import com.spoteditor.backend.modules.notification.repository.NotificationRepository;
+import com.spoteditor.backend.modules.user.common.dto.UserIdDto;
+import com.spoteditor.backend.modules.user.entity.User;
+import com.spoteditor.backend.modules.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

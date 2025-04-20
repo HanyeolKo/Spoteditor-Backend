@@ -1,8 +1,8 @@
 package com.spoteditor.backend.security.oauth.dto;
 
 import com.spoteditor.backend.config.oauth.dto.OauthAttributesUserMapper;
-import com.spoteditor.backend.user.entity.User;
-import com.spoteditor.backend.user.entity.Provider;
+import com.spoteditor.backend.modules.user.entity.User;
+import com.spoteditor.backend.modules.user.entity.Provider;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
