@@ -1,6 +1,0 @@
-package com.spoteditor.backend.follow.controller.dto;
-
-public record FollowRequest(
-	Long userId
-) {
-}

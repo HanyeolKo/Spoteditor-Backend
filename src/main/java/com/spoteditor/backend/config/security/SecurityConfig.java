@@ -1,12 +1,12 @@
 package com.spoteditor.backend.config.security;
 
-import com.spoteditor.backend.config.jwt.filter.JwtFilter;
-import com.spoteditor.backend.config.jwt.utils.JwtUtils;
-import com.spoteditor.backend.config.oauth.handler.OauthFailureHandler;
-import com.spoteditor.backend.config.oauth.handler.OauthSuccessHandler;
-import com.spoteditor.backend.config.oauth.resolver.CustomOAuth2AuthorizationRequestResolver;
-import com.spoteditor.backend.config.oauth.service.PrincipalOauth2UserService;
-import com.spoteditor.backend.config.util.CookieUtils;
+import com.spoteditor.backend.infrastructure.jwt.JwtFilter;
+import com.spoteditor.backend.infrastructure.jwt.JwtUtils;
+import com.spoteditor.backend.infrastructure.oauth.handler.OauthFailureHandler;
+import com.spoteditor.backend.infrastructure.oauth.handler.OauthSuccessHandler;
+import com.spoteditor.backend.infrastructure.oauth.resolver.CustomOAuth2AuthorizationRequestResolver;
+import com.spoteditor.backend.infrastructure.oauth.service.PrincipalOauth2UserService;
+import com.spoteditor.backend.global.utils.CookieUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

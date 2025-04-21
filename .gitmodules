@@ -1,0 +1,3 @@
+[submodule "src/main/resources/config"]
+	path = src/main/resources/config
+	url = git@github.com:spoteditor/Spoteditor-Backend-Config.git

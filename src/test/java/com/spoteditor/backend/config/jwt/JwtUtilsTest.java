@@ -1,7 +1,8 @@
 package com.spoteditor.backend.config.jwt;
 
-import com.spoteditor.backend.config.jwt.utils.JwtUtils;
-import com.spoteditor.backend.user.common.dto.UserIdDto;
+import com.spoteditor.backend.infrastructure.jwt.JwtProperties;
+import com.spoteditor.backend.infrastructure.jwt.JwtUtils;
+import com.spoteditor.backend.modules.user.common.dto.UserIdDto;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;

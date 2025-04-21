@@ -1,7 +1,8 @@
 package com.spoteditor.backend.user.controller;
 
 import com.spoteditor.backend.config.TestSecurityConfig;
-import com.spoteditor.backend.user.service.UserTokenService;
+import com.spoteditor.backend.modules.user.controller.AuthController;
+import com.spoteditor.backend.modules.user.service.UserTokenService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

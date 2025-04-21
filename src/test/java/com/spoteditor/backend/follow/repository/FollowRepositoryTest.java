@@ -1,12 +1,13 @@
 package com.spoteditor.backend.follow.repository;
 
 import com.spoteditor.backend.config.QuerydslConfig;
-import com.spoteditor.backend.config.page.CustomPageRequest;
-import com.spoteditor.backend.config.page.CustomPageResponse;
-import com.spoteditor.backend.follow.controller.dto.FollowResponse;
-import com.spoteditor.backend.follow.entity.Follow;
-import com.spoteditor.backend.user.entity.User;
-import com.spoteditor.backend.user.repository.UserRepository;
+import com.spoteditor.backend.global.page.CustomPageRequest;
+import com.spoteditor.backend.global.page.CustomPageResponse;
+import com.spoteditor.backend.modules.follow.controller.dto.FollowResponse;
+import com.spoteditor.backend.modules.follow.entity.Follow;
+import com.spoteditor.backend.modules.follow.repository.FollowRepository;
+import com.spoteditor.backend.modules.user.entity.User;
+import com.spoteditor.backend.modules.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

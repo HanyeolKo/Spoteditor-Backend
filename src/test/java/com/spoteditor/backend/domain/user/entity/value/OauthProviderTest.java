@@ -1,7 +1,7 @@
 package com.spoteditor.backend.domain.user.entity.value;
 
 import com.spoteditor.backend.global.exception.UserException;
-import com.spoteditor.backend.user.entity.Provider;
+import com.spoteditor.backend.modules.user.entity.Provider;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
