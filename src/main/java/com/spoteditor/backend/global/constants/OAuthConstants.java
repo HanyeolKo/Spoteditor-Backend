@@ -9,7 +9,8 @@ public class OAuthConstants {
     public static final List<String> REDIRECT_WHITELIST = List.of(
             "https://localhost:5173",
             "https://spoteditor-frontend.vercel.app",
-            "https://spoteditor.duckdns.org"
+            "https://spoteditor.duckdns.org",
+            "https://www.thespoteditor.com"
     );
 
     // 쿠키 관련 상수
