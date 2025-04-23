@@ -7,6 +7,7 @@ services:
     networks:
       - redis-cluster-compose
     image: rabbitmq:management-alpine
+    restart: always
     container_name: rabbit-mq-container
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -21,6 +22,7 @@ services:
       - RABBITMQ_DEFAULT_PASS=admin
 
   spring-1:
+    restart: always
     build: .
     networks:
       - redis-cluster-compose
@@ -31,6 +33,7 @@ services:
       - "8080"
 
   spring-2:
+    restart: always
     build: .
     networks:
       - redis-cluster-compose
@@ -42,6 +45,7 @@ services:
 
   nginx:
     image: nginx:latest
+    restart: always
     container_name: nginx
     ports:
       - "80:80"
