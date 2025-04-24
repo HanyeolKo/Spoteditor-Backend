@@ -1,5 +1,7 @@
 package com.spoteditor.backend.infrastructure.oauth.repository;
 
+import com.spoteditor.backend.config.redis.key.OAuth2RequestKeyBuilder;
+import com.spoteditor.backend.config.util.Base64Util;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,7 +32,7 @@ public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationR
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, OAUTH_REQUEST_COOKIE);
         if (cookie != null && StringUtils.hasText(cookie.getValue())) {
-            String key = decodeKey(cookie.getValue());
+            String key = Base64Util.URLDECODE(cookie.getValue());
             Map<Object, Object> data = redisTemplate.opsForHash().entries(key);
             return deserializeAuthorizationRequest(data);
         }
@@ -47,7 +49,7 @@ public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationR
             return;
         }
 
-        String key = generateKey(authorizationRequest);
+        String key = OAuth2RequestKeyBuilder.build(authorizationRequest);
 
         Map<String, String> serializedRequest = serializeAuthorizationRequest(authorizationRequest);
 
@@ -77,7 +79,7 @@ public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationR
         //log.info("redirect 주소 COOKIE 저장완료 : {}::{}", REDIRECT_COOKIE, redirect);
 
         // redis키 쿠키에 저장
-        Cookie cookie = new Cookie(OAUTH_REQUEST_COOKIE, encodeKey(key));
+        Cookie cookie = new Cookie(OAUTH_REQUEST_COOKIE, Base64Util.URLENCODE(key));
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         cookie.setMaxAge((int) REQUEST_TEMP_EXPIRATION.getSeconds());
@@ -97,7 +99,7 @@ public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationR
 
         // Redis 상태 정보 제거
         if (requestObj != null) {
-            String key = generateKey(requestObj);
+            String key = OAuth2RequestKeyBuilder.build(requestObj);
             redisTemplate.delete(key);
         }
 
@@ -109,22 +111,6 @@ public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationR
 
         return requestObj;
     }
-
-    /**
-     * OAuth2AuthorizationRequest의 state 값을 기반으로 Redis 키 생성
-     */
-    private String generateKey(OAuth2AuthorizationRequest request) {
-        return REQUEST_REDIS_TAG + request.getState();
-    }
-
-    private String encodeKey(String key) {
-        return Base64.getUrlEncoder().encodeToString(key.getBytes());
-    }
-
-    private String decodeKey(String encodedKey) {
-        return new String(Base64.getUrlDecoder().decode(encodedKey));
-    }
-
     /**
      *  역/직렬화시 JSON 타입으로 저장하는 것을 권장
      *  Redis상에서 값 확인이 쉬움
