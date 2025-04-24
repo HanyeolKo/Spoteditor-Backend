@@ -73,4 +73,12 @@ public class JwtUtils {
             throw new SignatureException(e.getMessage(), e);
         }
     }
+
+    /**
+     * JWT 토큰정보를 검증하고 토큰에 저장된 UserID를 리턴
+     */
+    public Long extractUserIdFromToken(String token) throws ExpiredJwtException, IllegalArgumentException, MalformedJwtException, SignatureException {
+        UsernamePasswordAuthenticationToken authentication = setAuthentication(token);
+        return ((UserIdDto)authentication.getPrincipal()).getId();
+    }
 }

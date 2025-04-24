@@ -11,4 +11,6 @@ public class JwtConstants {
     public static final String ACCESS_TOKEN = "AccessToken";
 
     public static final String REFRESH_TOKEN = "RefreshToken";
+
+    public static final String REFRESH_REDIS_KEY_PREFIX = "refresh-token:";
 }

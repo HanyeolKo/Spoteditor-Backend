@@ -1,12 +1,14 @@
 package com.spoteditor.backend.infrastructure.oauth.handler;
 
+import com.spoteditor.backend.config.jwt.repository.RefreshTokenRepository;
+import com.spoteditor.backend.config.redis.key.RefreshTokenKeyBuilder;
 import com.spoteditor.backend.global.constants.JwtConstants;
 import com.spoteditor.backend.infrastructure.jwt.JwtUtils;
 import com.spoteditor.backend.global.constants.OAuthConstants;
 import com.spoteditor.backend.infrastructure.oauth.provider.GoogleUserInfo;
 import com.spoteditor.backend.infrastructure.oauth.provider.KakaoUserInfo;
 import com.spoteditor.backend.infrastructure.oauth.provider.OAuth2UserInfo;
-import com.spoteditor.backend.global.utils.CookieUtils;
+import com.spoteditor.backend.global.utils.CookieUtil;
 import com.spoteditor.backend.global.exception.UserException;
 import com.spoteditor.backend.modules.user.entity.User;
 import com.spoteditor.backend.modules.user.repository.UserRepository;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
 
@@ -40,9 +43,10 @@ import static com.spoteditor.backend.global.response.ErrorCode.NOT_FOUND_USER;
 public class OauthSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtUtils jwtUtils;
-    private final CookieUtils cookieUtils;
+    private final CookieUtil cookieUtil;
     private final UserRepository userRepository;
     private final AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Value("${app.oauth.success-redirect-url}")
     private String successRedirectUrl;
@@ -69,8 +73,8 @@ public class OauthSuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = jwtUtils.createAccessToken(user.getId(), role);
         String refreshToken = jwtUtils.createRefreshToken(user.getId(), role);
 
-        cookieUtils.setAccessTokenCookie(response, JwtConstants.ACCESS_TOKEN, accessToken);
-        cookieUtils.setRefreshTokenCookie(response, JwtConstants.REFRESH_TOKEN, refreshToken);
+        cookieUtil.setAccessTokenCookie(response, JwtConstants.ACCESS_TOKEN, accessToken);
+        cookieUtil.setRefreshTokenCookie(response, JwtConstants.REFRESH_TOKEN, refreshToken);
 
         Cookie redirectCookie = WebUtils.getCookie(request, REDIRECT_COOKIE);
         String redirectUrlTemp;
@@ -87,6 +91,9 @@ public class OauthSuccessHandler implements AuthenticationSuccessHandler {
         } else {
             redirectUrlTemp = "";
         }
+
+        // redis
+        refreshTokenRepository.saveToken(RefreshTokenKeyBuilder.build(user.getId()), refreshToken, Duration.ofDays(7));
 
         String redirectUrl = OAuthConstants.REDIRECT_WHITELIST.stream()
                 .filter(allowUrl -> !redirectUrlTemp.equals("") && redirectUrlTemp.startsWith(allowUrl))

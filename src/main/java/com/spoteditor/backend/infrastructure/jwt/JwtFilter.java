@@ -2,7 +2,7 @@ package com.spoteditor.backend.infrastructure.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.spoteditor.backend.global.utils.CookieUtils;
+import com.spoteditor.backend.global.utils.CookieUtil;
 import com.spoteditor.backend.global.exception.TokenException;
 import com.spoteditor.backend.global.response.ErrorCode;
 import com.spoteditor.backend.global.response.ErrorResponse;
@@ -31,7 +31,7 @@ import static com.spoteditor.backend.global.response.ErrorCode.INVALID_ACCESS_TO
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
-    private final CookieUtils cookieUtils;
+    private final CookieUtil cookieUtil;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -48,7 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 쿠키에서 jwt 추출
-        String accessToken = cookieUtils.getAccessToken(request);
+        String accessToken = cookieUtil.getAccessToken(request);
         log.info(accessToken);
 
         String path = request.getRequestURI();
@@ -59,8 +59,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // 인증정보 SecurityContextHolder 에 등록
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
             filterChain.doFilter(request, response);
+
         } catch(ExpiredJwtException | MalformedJwtException | SignatureException e) {
             handleException(response, new TokenException(INVALID_ACCESS_TOKEN));
         } catch(IllegalArgumentException e) {

@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class CookieUtils {
+public class CookieUtil {
 
     private final JwtProperties jwtProperties;
 

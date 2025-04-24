@@ -6,7 +6,7 @@ import com.spoteditor.backend.infrastructure.oauth.handler.OauthFailureHandler;
 import com.spoteditor.backend.infrastructure.oauth.handler.OauthSuccessHandler;
 import com.spoteditor.backend.infrastructure.oauth.resolver.CustomOAuth2AuthorizationRequestResolver;
 import com.spoteditor.backend.infrastructure.oauth.service.PrincipalOauth2UserService;
-import com.spoteditor.backend.global.utils.CookieUtils;
+import com.spoteditor.backend.global.utils.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +32,7 @@ public class SecurityConfig {
     private final ClientRegistrationRepository clientRegistrationRepository;
 
     private final JwtUtils jwtUtils;
-    private final CookieUtils cookieUtils;
+    private final CookieUtil cookieUtil;
 
     private final CorsConfigurationSource corsConfigurationSource;
 
@@ -50,7 +50,7 @@ public class SecurityConfig {
             .sessionManagement(sessionManagement ->
                     sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            .addFilterBefore(new JwtFilter(jwtUtils, cookieUtils), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new JwtFilter(jwtUtils, cookieUtil), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/**").permitAll()
