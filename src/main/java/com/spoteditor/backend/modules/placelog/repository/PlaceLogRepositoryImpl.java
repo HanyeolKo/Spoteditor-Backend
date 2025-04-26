@@ -1,5 +1,6 @@
 package com.spoteditor.backend.modules.placelog.repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -8,6 +9,7 @@ import com.spoteditor.backend.global.page.CustomPageResponse;
 import com.spoteditor.backend.modules.image.controller.dto.PlaceImageResponse;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogListResponse;
 import com.spoteditor.backend.modules.placelog.entity.PlaceLogStatus;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -231,6 +233,11 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
     public CustomPageResponse<PlaceLogListResponse> searchByName(CustomPageRequest request, String name) {
         PageRequest pageRequest = request.of();
 
+        BooleanBuilder searchCondition = new BooleanBuilder()
+                .or(placeLog.name.contains(name))
+                .or(placeLog.address.bname.contains(name))
+                .or(placeLog.address.sido.contains(name));
+
         List<PlaceLogListResponse> placeLogList = queryFactory
                 .select(Projections.constructor(PlaceLogListResponse.class,
                         placeLog.id,
@@ -246,7 +253,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                 ))
                 .from(placeLog)
                 .leftJoin(placeLog.placeLogImage, placeImage)
-                .where(placeLog.name.contains(name))
+                .where(searchCondition)
                 .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
@@ -256,7 +263,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
         JPAQuery<Long> queryCount = queryFactory
                 .select(placeLog.count())
                 .from(placeLog)
-                .where(placeLog.name.contains(name))
+                .where(searchCondition)
                 .where(placeLog.status.eq(PlaceLogStatus.PUBLIC));
 
         Page<PlaceLogListResponse> page = PageableExecutionUtils.getPage(
