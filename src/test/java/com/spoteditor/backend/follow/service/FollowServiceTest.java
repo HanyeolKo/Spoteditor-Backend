@@ -1,5 +1,6 @@
 package com.spoteditor.backend.follow.service;
 
+import com.spoteditor.backend.config.RedisTestConfiguration;
 import com.spoteditor.backend.modules.follow.controller.dto.FollowRequest;
 import com.spoteditor.backend.modules.follow.repository.FollowRepository;
 import com.spoteditor.backend.modules.follow.service.facade.FollowFacade;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Import(RedisTestConfiguration.class)
 class FollowServiceTest {
 
 	@Autowired private FollowFacade followFacade;
