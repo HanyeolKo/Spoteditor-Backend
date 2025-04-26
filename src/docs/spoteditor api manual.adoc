@@ -1,0 +1,60 @@
+= Spot Editor API 명세서
+:toc: left
+:toclevels: 2
+:toc-title: 목차
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:sectanchors:
+:sectnums:
+:snippets: {snippets}
+:operation-http-request-title: 🔹 요청 예시
+:operation-http-response-title: 🔸 응답 예시
+
+++++
+<style>
+#toc a {
+    color: #000000 !important; /* 검정색 */
+    text-decoration: none;
+}
+#toc a:hover {
+    color: SKYBLUE !important; /* 호버 시 분홍색 */
+}
+
+#toctitle{
+    color: black;
+}
+</style>
+++++
+
+
+== 예제
+[NOTE]
+**METHOD**: 'POST' +
+**URI**: /api/v1/auth/logout
+
+예제입니다.
+
+=== 요청 예시
+operation::example[snippets="http-request"]
+
+=== 응답
+operation::example[snippets="http-response"]
+
+[WARNING]
+====
+📌 **주의사항**
+
+- 모든 API는 기본적으로 JSON 형식으로 요청 및 응답합니다.
+- API 요청 시 인증이 필요한 경우, 요청 헤더에 반드시 `Authorization: Bearer {accessToken}`을 포함해야 합니다.
+====
+
+[IMPORTANT]
+====
+🔐 **보안 관련**
+
+- Access Token의 유효기간(5분)은 짧으므로 만료 시 Refresh Token(7일)을 통해 갱신하세요.
+- Refresh Token은 안전하게 보관하고, 클라이언트 코드에 노출되지 않도록 합니다.
+====
+
+---
