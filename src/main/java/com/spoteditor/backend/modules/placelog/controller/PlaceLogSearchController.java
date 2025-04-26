@@ -20,14 +20,16 @@ public class PlaceLogSearchController {
     private final PlaceLogRepository placeLogRepository;
 
     @GetMapping("/search/placelogs/address")
-    public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByAddress(
-            CustomPageRequest pageRequest,
-            String sido,
-            String bname
+    public ResponseEntity<CustomPageResponse<?>> getPlaceLogsByAddress(
+            @ModelAttribute CustomPageRequest pageRequest,
+            @RequestParam String sido,
+            @RequestParam String bname
     ) {
+        CustomPageResponse<PlaceLogListResponse> response = placeLogRepository.searchBySidoBname(pageRequest, sido, bname);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(placeLogRepository.searchBySidoBname(pageRequest, sido, bname));
+                .body(response);
     }
 
     @GetMapping("/search/placelogs/name")
@@ -40,8 +42,10 @@ public class PlaceLogSearchController {
             throw new PlaceLogException(INVALID_TYPE_VALUE);
         }
 
+        CustomPageResponse<PlaceLogListResponse> response = placeLogRepository.searchByName(pageRequest, searchName);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(placeLogRepository.searchByName(pageRequest, searchName));
+                .body(response);
     }
 }
