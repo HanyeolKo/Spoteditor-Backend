@@ -2,6 +2,7 @@ package com.spoteditor.backend.global.page;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.domain.PageRequest;
 
 import static org.springframework.data.domain.Sort.Direction;
 
@@ -26,7 +27,15 @@ public class CustomPageRequest {
 		this.direction = direction;
 	}
 
-	public org.springframework.data.domain.PageRequest of() {
-		return org.springframework.data.domain.PageRequest.of(page - 1, size, direction, "created_at");
+	public PageRequest of() {
+
+		PageRequest pageRequest;
+		try {
+			pageRequest = PageRequest.of(page - 1, size, direction, "created_at");
+		}catch (IllegalArgumentException e){	//	direction이 없는 경우
+			pageRequest = PageRequest.of(0, 12, Direction.ASC, "created_at");
+		}
+
+		return pageRequest;
 	}
 }
