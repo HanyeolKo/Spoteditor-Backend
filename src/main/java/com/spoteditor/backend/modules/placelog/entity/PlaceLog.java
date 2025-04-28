@@ -9,16 +9,14 @@ import com.spoteditor.backend.modules.place.entity.Address;
 import com.spoteditor.backend.modules.user.entity.User;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "place_log")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PlaceLog extends BaseEntity {
@@ -61,6 +59,9 @@ public class PlaceLog extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private PlaceLogStatus status;
+
+    @Column(name = "popularity_score")
+    private float popularityScore;
 
     @Version
     private Long version;

@@ -1,6 +1,7 @@
 package com.spoteditor.backend.modules.placelog.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -9,7 +10,7 @@ import com.spoteditor.backend.global.page.CustomPageResponse;
 import com.spoteditor.backend.modules.image.controller.dto.PlaceImageResponse;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogListResponse;
 import com.spoteditor.backend.modules.placelog.entity.PlaceLogStatus;
-import jakarta.annotation.Nullable;
+import com.spoteditor.backend.modules.placelog.service.dto.PlaceLogWithBookmark;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.spoteditor.backend.modules.bookmark.entity.QBookmark.bookmark;
 import static com.spoteditor.backend.modules.image.entity.QPlaceImage.placeImage;
 import static com.spoteditor.backend.modules.mapping.userplacelogmapping.entity.QUserPlaceLogMapping.userPlaceLogMapping;
 import static com.spoteditor.backend.modules.placelog.entity.QPlaceLog.placeLog;
@@ -29,7 +31,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public CustomPageResponse<PlaceLogListResponse> findAllPlace(CustomPageRequest request) {
+    public CustomPageResponse<PlaceLogListResponse> findAllPlace(CustomPageRequest request, OrderSpecifier<?> orderSpecifier) {
         PageRequest pageRequest = request.of();
 
         List<PlaceLogListResponse> placeLogList = queryFactory
@@ -43,14 +45,15 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                             placeImage.storedFile
                         ),
                         placeLog.address,
-                        placeLog.views
+                        placeLog.views,
+                        placeLog.popularityScore
                 ))
                 .from(placeLog)
                 .leftJoin(placeLog.placeLogImage, placeImage)
                 .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
-                .orderBy(placeLog.createdAt.desc())
+                .orderBy(orderSpecifier)
                 .fetch();
 
         JPAQuery<Long> queryCount = queryFactory
@@ -81,7 +84,8 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                                 placeImage.storedFile
                         ),
                         placeLog.address,
-                        placeLog.views
+                        placeLog.views,
+                        placeLog.popularityScore
                 ))
                 .from(placeLog)
                 .leftJoin(placeLog.placeLogImage, placeImage)
@@ -120,7 +124,8 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                                 placeImage.storedFile
                         ),
                         placeLog.address,
-                        placeLog.views
+                        placeLog.views,
+                        placeLog.popularityScore
                 ))
                 .from(placeLog)
                 .leftJoin(placeLog.placeLogImage, placeImage)
@@ -161,7 +166,8 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                                 placeImage.storedFile
                         ),
                         placeLog.address,
-                        placeLog.views
+                        placeLog.views,
+                        placeLog.popularityScore
                 ))
                 .from(userPlaceLogMapping)
                 .join(userPlaceLogMapping.placeLog, placeLog)
@@ -201,7 +207,8 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                                 placeImage.storedFile
                         ),
                         placeLog.address,
-                        placeLog.views
+                        placeLog.views,
+                        placeLog.popularityScore
                 ))
                 .from(placeLog)
                 .leftJoin(placeLog.placeLogImage, placeImage)
@@ -249,7 +256,8 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                                 placeImage.storedFile
                         ),
                         placeLog.address,
-                        placeLog.views
+                        placeLog.views,
+                        placeLog.popularityScore
                 ))
                 .from(placeLog)
                 .leftJoin(placeLog.placeLogImage, placeImage)
@@ -273,5 +281,25 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
         );
 
         return new CustomPageResponse<>(page);
+    }
+
+    @Override
+    public List<PlaceLogWithBookmark> findPlaceLogWithBookmarkCount(int limit, int offset) {
+
+        return queryFactory
+                .select(Projections.constructor(
+                        PlaceLogWithBookmark.class,
+                        placeLog.id,
+                        placeLog.views,
+                        placeLog.createdAt,
+                        bookmark.id.countDistinct()
+                ))
+                .from(placeLog)
+                .leftJoin(bookmark).on(bookmark.place.id.eq(placeLog.id))
+                .groupBy(placeLog.id)
+                .orderBy(placeLog.id.asc())
+                .offset(offset)
+                .limit(limit)
+                .fetch();
     }
 }

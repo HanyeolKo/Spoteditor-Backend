@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static com.spoteditor.backend.global.response.ErrorCode.INVALID_TYPE_VALUE;
+import static com.spoteditor.backend.modules.placelog.entity.QPlaceLog.placeLog;
 
 @RestController
 @RequestMapping("/api")
@@ -35,7 +36,7 @@ public class PlaceLogSearchController {
     @GetMapping("/search/placelogs/name")
     public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByName(
             CustomPageRequest pageRequest,
-            String name
+            @RequestParam String name
     ) {
         String searchName = name.trim();
         if(searchName.length() < 2) {
@@ -46,6 +47,14 @@ public class PlaceLogSearchController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @GetMapping("/search/placelogs/popularity")
+    public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByPopularity(CustomPageRequest request){
+        CustomPageResponse<PlaceLogListResponse> response = placeLogRepository.findAllPlace(request, placeLog.popularityScore.desc());
+
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
     }
 }
