@@ -35,7 +35,7 @@ public class PlaceLogSearchController {
 
     @GetMapping("/search/placelogs/name")
     public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByName(
-            CustomPageRequest pageRequest,
+            @ModelAttribute CustomPageRequest pageRequest,
             @RequestParam String name
     ) {
         String searchName = name.trim();
@@ -51,7 +51,9 @@ public class PlaceLogSearchController {
     }
 
     @GetMapping("/search/placelogs/popularity")
-    public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByPopularity(CustomPageRequest request){
+    public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByPopularity(
+            @ModelAttribute CustomPageRequest request
+    ){
         CustomPageResponse<PlaceLogListResponse> response = placeLogRepository.findAllPlace(request, placeLog.popularityScore.desc());
 
         return ResponseEntity.status(HttpStatus.OK)
