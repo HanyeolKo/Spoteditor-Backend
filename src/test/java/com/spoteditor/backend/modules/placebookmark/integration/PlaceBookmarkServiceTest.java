@@ -1,6 +1,6 @@
 package com.spoteditor.backend.modules.placebookmark.integration;
 
-import com.spoteditor.backend.global.exception.BookmarkException;
+import com.spoteditor.backend.global.exception.PlaceBookmarkException;
 import com.spoteditor.backend.modules.placebookmark.controller.dto.PlaceBookmarkRequest;
 import com.spoteditor.backend.modules.placebookmark.repository.PlaceBookmarkRepository;
 import com.spoteditor.backend.modules.image.entity.PlaceImage;
@@ -84,6 +84,7 @@ class PlaceBookmarkServiceTest {
 		userRepository.deleteAll();
 	}
 
+	// ✅ 공간 북마크 요청 처리
 	@Test
 	@DisplayName("사용자는 공간에 대한 북마크 처리를 요청할 수 있다.")
 	void 사용자는_공간에_대한_북마크_처리를_요청할_수_있다() {
@@ -104,6 +105,7 @@ class PlaceBookmarkServiceTest {
 		assertThat(bookmarkRepository.count()).isEqualTo(1);
 	}
 
+	// ✅ 공간 북마크 취소 처리
 	@Test
 	@DisplayName("사용자는 공간에 대한 북마크 처리를 취소할 수 있다.")
 	void 사용자는_공간에_대한_북마크_처리를_취소할_수_있다() {
@@ -125,6 +127,7 @@ class PlaceBookmarkServiceTest {
 		assertThat(bookmarkRepository.count()).isZero();
 	}
 
+	// ✅ 중복 북마크 예외 처리
 	@Test
 	@DisplayName("공간에 대해 중복으로 북마크 처리를 할 수 없다.")
 	void 공간에_대해_중복으로_북마크_처리를_할_수_없다() {
@@ -143,7 +146,7 @@ class PlaceBookmarkServiceTest {
 		assertThatThrownBy(() -> {
 			bookmarkService.addPlaceBookmark(userId, commandDto);
 		})
-				.isInstanceOf(BookmarkException.class)
+				.isInstanceOf(PlaceBookmarkException.class)
 				.extracting("errorCode")
 				.isEqualTo(BOOKMARK_ALREADY_EXIST);
 	}

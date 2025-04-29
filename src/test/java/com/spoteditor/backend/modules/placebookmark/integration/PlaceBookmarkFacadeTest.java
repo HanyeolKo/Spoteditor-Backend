@@ -44,7 +44,7 @@ class PlaceBookmarkFacadeTest {
 	PlaceImage image;
 	PlaceLog log;
 
-	int threads = 200;
+	int threads = 1000;
 
 	@BeforeEach
 	void beforeEach() {
@@ -96,6 +96,7 @@ class PlaceBookmarkFacadeTest {
 		userRepository.deleteAll();
 	}
 
+	// ✅ 동시성 환경(1000개의 쓰레드에 대해서 체크 완료)
 	@Test
 	@DisplayName("여러 사용자가 동시에 하나의 공간에 대해 북마크 요청을 할 수 있다.")
 	void 여러_사용자가_동시에_하나의_공간에_대해_북마크_요청을_할_수_있다() throws InterruptedException {
@@ -127,6 +128,7 @@ class PlaceBookmarkFacadeTest {
 		assertThat(bookmarkRepository.count()).isEqualTo(threads);
 	}
 
+	// ✅ 동시성 환경(1000개의 쓰레드에 대해서 체크 완료)
 	@Test
 	@DisplayName("여러 사용자가 동시에 하나의 공간에 대해 북마크 취소를 할 수 있다.")
 	void 여러_사용자가_동시에_하나의_공간에_대해_북마크_취소를_할_수_있다() throws InterruptedException {
