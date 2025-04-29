@@ -4,9 +4,9 @@ import com.spoteditor.backend.global.response.ErrorCode;
 import lombok.Getter;
 
 @Getter
-public class BookmarkException extends BusinessException {
+public class PlaceBookmarkException extends BusinessException {
 
-	public BookmarkException(ErrorCode errorCode) {
+	public PlaceBookmarkException(ErrorCode errorCode) {
 		super(errorCode);
 	}
 }

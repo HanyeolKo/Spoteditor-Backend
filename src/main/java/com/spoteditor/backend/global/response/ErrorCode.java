@@ -40,7 +40,7 @@ public enum ErrorCode {
 	NOT_PLACE_IMAGE(HttpStatus.NOT_FOUND, "P004", "장소의 이미지가 아닙니다"),
 
 	// bookmark
-	NOT_FOUND_BOOKMARK(HttpStatus.NOT_FOUND, "B001", "해당 북마크를 찾을 수 없습니다."),
+	NOT_FOUND_PLACE_BOOKMARK(HttpStatus.NOT_FOUND, "B001", "해당 공간 북마크를 찾을 수 없습니다."),
 	BOOKMARK_PROCESSING_FAILED(HttpStatus.CONFLICT, "B002", "북마크 처리에 실패했습니다. 잠시 후 다시 시도해주세요."),
 	BOOKMARK_ALREADY_EXIST(HttpStatus.CONFLICT, "B003", "북마크가 이미 존재합니다."),
 	BOOKMARK_ALREADY_REMOVED(HttpStatus.CONFLICT, "B004", "북마크가 존재하지 않습니다."),
