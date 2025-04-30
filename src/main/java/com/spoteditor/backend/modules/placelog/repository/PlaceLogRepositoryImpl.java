@@ -9,6 +9,7 @@ import com.spoteditor.backend.global.page.CustomPageRequest;
 import com.spoteditor.backend.global.page.CustomPageResponse;
 import com.spoteditor.backend.modules.image.controller.dto.PlaceImageResponse;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogListResponse;
+import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogSortType;
 import com.spoteditor.backend.modules.placelog.entity.PlaceLogStatus;
 import com.spoteditor.backend.modules.placelog.service.dto.PlaceLogWithBookmark;
 import lombok.RequiredArgsConstructor;
@@ -193,7 +194,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
     }
 
     @Override
-    public CustomPageResponse<PlaceLogListResponse> searchBySidoBname(CustomPageRequest request, String sido, String bname) {
+    public CustomPageResponse<PlaceLogListResponse> searchBySidoBname(CustomPageRequest request, String sido, String bname, PlaceLogSortType sort) {
         PageRequest pageRequest = request.of();
 
         List<PlaceLogListResponse> placeLogList = queryFactory
@@ -217,7 +218,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                 .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
-                .orderBy(placeLog.createdAt.desc())
+                .orderBy(sort.getOrderSpecifier(request.getDirection()))
                 .fetch();
 
         JPAQuery<Long> queryCount = queryFactory
@@ -237,7 +238,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
     }
 
     @Override
-    public CustomPageResponse<PlaceLogListResponse> searchByName(CustomPageRequest request, String name) {
+    public CustomPageResponse<PlaceLogListResponse> searchByName(CustomPageRequest request, String name, PlaceLogSortType sort) {
         PageRequest pageRequest = request.of();
 
         BooleanBuilder searchCondition = new BooleanBuilder()
@@ -265,7 +266,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                 .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
-                .orderBy(placeLog.createdAt.desc())
+                .orderBy(sort.getOrderSpecifier(request.getDirection()))
                 .fetch();
 
         JPAQuery<Long> queryCount = queryFactory

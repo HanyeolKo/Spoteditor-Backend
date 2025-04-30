@@ -5,6 +5,7 @@ import com.spoteditor.backend.global.page.CustomPageRequest;
 import com.spoteditor.backend.global.page.CustomPageResponse;
 
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogListResponse;
+import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogSortType;
 import com.spoteditor.backend.modules.placelog.service.dto.PlaceLogWithBookmark;
 
 import java.util.List;
@@ -19,9 +20,9 @@ public interface PlaceLogRepositoryCustom {
 
     CustomPageResponse<PlaceLogListResponse> findMyBookmarkPlaceLog(Long userId, CustomPageRequest pageRequest);
 
-    CustomPageResponse<PlaceLogListResponse> searchBySidoBname(CustomPageRequest pageRequest, String sido, String bname);
+    CustomPageResponse<PlaceLogListResponse> searchBySidoBname(CustomPageRequest pageRequest, String sido, String bname, PlaceLogSortType sort);
 
-    CustomPageResponse<PlaceLogListResponse> searchByName(CustomPageRequest pageRequest, String name);
+    CustomPageResponse<PlaceLogListResponse> searchByName(CustomPageRequest pageRequest, String name, PlaceLogSortType sort);
 
     List<PlaceLogWithBookmark> findPlaceLogWithBookmarkCount(int limit, int offset);
 }
