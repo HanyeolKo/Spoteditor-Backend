@@ -1,21 +1,29 @@
-package com.spoteditor.backend.infrastructure.redis;
+package com.spoteditor.backend.config;
 
+import com.spoteditor.backend.infrastructure.redis.RedisProperties;
 import lombok.RequiredArgsConstructor;
 import org.redisson.Redisson;
+import org.redisson.api.NatMapper;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.redisson.misc.RedisURI;
+import org.redisson.spring.data.connection.RedissonConnectionFactory;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Configuration
+import java.util.Map;
+
+@TestConfiguration
 @RequiredArgsConstructor
-@Profile("!test")
-public class RedisConfiguration {
+@EnableConfigurationProperties(RedisProperties.class)
+@Profile("test")
+public class RedisTestConfiguration {
 
 	private final RedisProperties redisProperties;
 
@@ -27,12 +35,37 @@ public class RedisConfiguration {
 
 		config.useClusterServers()
 				.setScanInterval(2000)
-				.addNodeAddress(nodes);
+				.setCheckSlotsCoverage(false)
+				.addNodeAddress(nodes)
+				.setNatMapper(new NatMapper() {
+					private final Map<String, String> natMapping = Map.of(
+							"172.18.0.4:6379", "127.0.0.1:6379",
+							"172.18.0.2:6379", "127.0.0.1:6380",
+							"172.18.0.8:6379", "127.0.0.1:6381",
+							"172.18.0.7:6379", "127.0.0.1:6382",
+							"172.18.0.9:6379", "127.0.0.1:6383",
+							"172.18.0.6:6379", "127.0.0.1:6384"
+					);
+					@Override
+					public RedisURI map(RedisURI uri) {
+						String key = uri.getHost() + ":" + uri.getPort();
+						String mappedAddress = natMapping.get(key);
+						if (mappedAddress != null) {
+							String[] parts = mappedAddress.split(":");
+							return new RedisURI(uri.getScheme() + "://" + parts[0] + ":" + parts[1]);
+						}
+						return uri;
+					}
+				});
 
 		return Redisson.create(config);
 	}
 
-	// oauth2 인증을 위한 레디스 클러스터 저장 규격
+	@Bean
+	public RedisConnectionFactory redissonConnectionFactory(RedissonClient redissonClient) {
+		return new RedissonConnectionFactory(redissonClient);
+	}
+
 	@Bean
 	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
 		RedisTemplate<String, Object> template = new RedisTemplate<>();

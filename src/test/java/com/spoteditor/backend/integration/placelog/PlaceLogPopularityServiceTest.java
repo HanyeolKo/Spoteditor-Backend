@@ -1,8 +1,9 @@
 package com.spoteditor.backend.integration.placelog;
 
-import com.spoteditor.backend.config.RedisConfiguration;
+import com.spoteditor.backend.config.RedisTestConfiguration;
 import com.spoteditor.backend.config.jwt.repository.RefreshTokenRepository;
 import com.spoteditor.backend.global.entity.BaseEntity;
+import com.spoteditor.backend.global.exception.PlaceLogException;
 import com.spoteditor.backend.modules.placelog.entity.PlaceLog;
 import com.spoteditor.backend.modules.placelog.entity.PlaceLogStatus;
 import com.spoteditor.backend.modules.placelog.repository.PlaceLogRepository;
@@ -11,24 +12,19 @@ import com.spoteditor.backend.modules.placelog.service.PlaceLogPopularityService
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 
-import static com.spoteditor.backend.modules.placelog.constants.RedisKey.PLACELOG_POPULARITY_REDIS_PREFIX;
-import static org.assertj.core.api.Assertions.assertThat;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Import(RedisConfiguration.class)
+@Import(RedisTestConfiguration.class)
 @Transactional
 @Slf4j
 public class PlaceLogPopularityServiceTest {
@@ -42,11 +38,8 @@ public class PlaceLogPopularityServiceTest {
     @Autowired
     private PlaceLogPopularityRedisService placeLogPopularityRedisService;
 
+
     // 테스트용 MockBean 주입
-    @MockBean
-    private RedissonClient redissonClient;
-    @MockBean
-    private StringRedisTemplate stringRedisTemplate;
     @MockBean
     private RefreshTokenRepository refreshTokenRepository;
     
@@ -77,10 +70,20 @@ public class PlaceLogPopularityServiceTest {
         placeLogRepository.save(placeLog1);
         placeLogRepository.save(placeLog2);
 
+        placeLogRepository.flush();
+
         //when
         placeLogPopularityService.updatePopularityScoreOnRedis();
 
         //then
+        placeLogRepository.findPlaceLogWithBookmarkCount(Integer.MAX_VALUE, 0).forEach(l -> {
+            System.out.println("ID : " + l.placeLogId());
+            System.out.println("BOOKMARK : " + l.bookmarkCount());
+            System.out.println("VIEW : " + l.viewCount());
+            System.out.println(l.createAt());
+            System.out.println("---------------------------");
+        });
+
         System.out.println("인기순 출력 ㄱ");
         placeLogPopularityRedisService.getAllPopularityList().forEach(System.out::println);
 
