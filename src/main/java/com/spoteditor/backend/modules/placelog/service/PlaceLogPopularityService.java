@@ -81,6 +81,7 @@ public class PlaceLogPopularityService {
         }
     }
 
+    @Async
     public void updatePopularityScoreOnRedis(){
 
         // 게시글 전체 조회
