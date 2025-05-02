@@ -9,7 +9,6 @@ import com.spoteditor.backend.global.page.CustomPageRequest;
 import com.spoteditor.backend.global.page.CustomPageResponse;
 import com.spoteditor.backend.modules.image.controller.dto.PlaceImageResponse;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogListResponse;
-import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogSortType;
 import com.spoteditor.backend.modules.placelog.entity.PlaceLogStatus;
 import com.spoteditor.backend.modules.placelog.service.dto.PlaceLogWithBookmark;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +23,9 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.spoteditor.backend.modules.bookmark.entity.QBookmark.bookmark;
 import static com.spoteditor.backend.modules.image.entity.QPlaceImage.placeImage;
 import static com.spoteditor.backend.modules.mapping.userplacelogmapping.entity.QUserPlaceLogMapping.userPlaceLogMapping;
+import static com.spoteditor.backend.modules.placebookmark.entity.QPlaceBookmark.placeBookmark;
 import static com.spoteditor.backend.modules.placelog.entity.QPlaceLog.placeLog;
 
 @Repository
@@ -291,10 +290,10 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                         placeLog.id,
                         placeLog.views,
                         placeLog.createdAt,
-                        bookmark.id.countDistinct()
+                        placeBookmark.id.countDistinct()
                 ))
                 .from(placeLog)
-                .leftJoin(bookmark).on(bookmark.place.id.eq(placeLog.id))
+                .leftJoin(placeBookmark).on(placeBookmark.place.id.eq(placeLog.id))
                 .groupBy(placeLog.id)
                 .orderBy(placeLog.id.asc())
                 .offset(offset)
