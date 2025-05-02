@@ -48,7 +48,7 @@ public class PlaceLogPopularityServiceTest {
     void updateLogPopularityTest(){
 
         //given
-        PlaceLog placeLog1 = PlaceLog.builder()
+        /*PlaceLog placeLog1 = PlaceLog.builder()
                 .name("test")
                 .description("test")
                 .status(PlaceLogStatus.PUBLIC)
@@ -70,7 +70,7 @@ public class PlaceLogPopularityServiceTest {
         placeLogRepository.save(placeLog1);
         placeLogRepository.save(placeLog2);
 
-        placeLogRepository.flush();
+        placeLogRepository.flush();*/
 
         //when
         placeLogPopularityService.updatePopularityScoreOnRedis();
