@@ -4,7 +4,6 @@ import com.spoteditor.backend.global.exception.ImageException;
 import com.spoteditor.backend.global.exception.PlaceException;
 import com.spoteditor.backend.global.exception.PlaceLogException;
 import com.spoteditor.backend.global.exception.UserException;
-import com.spoteditor.backend.modules.bookmark.repository.BookmarkRepository;
 import com.spoteditor.backend.modules.image.controller.dto.PlaceImageResponse;
 import com.spoteditor.backend.modules.image.entity.PlaceImage;
 import com.spoteditor.backend.modules.image.event.S3ImageAfterCommitEvent;
@@ -20,6 +19,7 @@ import com.spoteditor.backend.modules.place.controller.dto.PlaceRegisterRequest;
 import com.spoteditor.backend.modules.place.entity.Place;
 import com.spoteditor.backend.modules.place.repository.PlaceRepository;
 import com.spoteditor.backend.modules.place.service.dto.PlaceRegisterCommand;
+import com.spoteditor.backend.modules.placebookmark.repository.PlaceBookmarkRepository;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogBookmarkResponse;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogPlaceRegisterRequest;
 import com.spoteditor.backend.modules.placelog.entity.PlaceLog;
@@ -55,7 +55,7 @@ public class PlaceLogServiceImpl implements PlaceLogService {
     private final PlaceImageService imageService;
     private final PlaceImageRepository placeImageRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final BookmarkRepository bookmarkRepository;
+    private final PlaceBookmarkRepository bookmarkRepository;
 
     @Override
     @Transactional

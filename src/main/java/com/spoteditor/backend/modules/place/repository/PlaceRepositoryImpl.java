@@ -18,9 +18,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.spoteditor.backend.modules.bookmark.entity.QBookmark.bookmark;
 import static com.spoteditor.backend.modules.image.entity.QPlaceImage.placeImage;
 import static com.spoteditor.backend.modules.place.entity.QPlace.place;
+import static com.spoteditor.backend.modules.placebookmark.entity.QPlaceBookmark.placeBookmark;
 
 @Repository
 @RequiredArgsConstructor
@@ -95,8 +95,8 @@ public class PlaceRepositoryImpl implements PlaceRepositoryCustom {
 								placeImage.storedFile
 						)
 				))
-				.from(bookmark)
-				.join(bookmark.place, place)
+				.from(placeBookmark)
+				.join(placeBookmark.place, place)
 				.leftJoin(placeImage).on(placeImage.place.id.eq(place.id)
 						.and(placeImage.createdAt.eq(
 								JPAExpressions
@@ -105,16 +105,16 @@ public class PlaceRepositoryImpl implements PlaceRepositoryCustom {
 										.where(subPlaceImage.place.id.eq(place.id))
 						)
 				))
-				.where(bookmark.user.id.eq(userId))
+				.where(placeBookmark.user.id.eq(userId))
 				.offset(pageRequest.getOffset())
 				.limit(pageRequest.getPageSize())
 				.orderBy(place.createdAt.desc())
 				.fetch();
 
 		JPAQuery<Long> queryCount = queryFactory
-				.select(bookmark.count())
-				.from(bookmark)
-				.where(bookmark.user.id.eq(userId));
+				.select(placeBookmark.count())
+				.from(placeBookmark)
+				.where(placeBookmark.user.id.eq(userId));
 
 		Page<PlaceResponse> page = PageableExecutionUtils.getPage(
 				placeList,
