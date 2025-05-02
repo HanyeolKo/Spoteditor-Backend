@@ -40,8 +40,8 @@ public class GlobalExceptionHandler {
 				.body(apiErrorResponse);
     }
 
-	@ExceptionHandler(BookmarkException.class)
-	public ResponseEntity<ErrorResponse> handleBookmarkException(BookmarkException e) {
+	@ExceptionHandler(PlaceBookmarkException.class)
+	public ResponseEntity<ErrorResponse> handleBookmarkException(PlaceBookmarkException e) {
 		ErrorResponse apiErrorResponse = ErrorResponse.of(
 				e.getErrorCode()
 		);

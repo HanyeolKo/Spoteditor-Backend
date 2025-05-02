@@ -1,6 +1,6 @@
 package com.spoteditor.backend.modules.placelog.service;
 
-import com.spoteditor.backend.global.exception.BookmarkException;
+import com.spoteditor.backend.global.exception.PlaceBookmarkException;
 import com.spoteditor.backend.global.exception.PlaceLogException;
 import com.spoteditor.backend.global.exception.UserException;
 import com.spoteditor.backend.modules.mapping.userplacelogmapping.entity.UserPlaceLogMapping;
@@ -36,7 +36,7 @@ public class PlaceLogBookmarkServiceImpl implements PlaceLogBookmarkService{
         UserPlaceLogMappingId mappingId = new UserPlaceLogMappingId(userId, placeLogId);
 
         if (userPlaceLogMappingRepository.existsById(mappingId)) {
-            throw new BookmarkException(BOOKMARK_ALREADY_EXIST);
+            throw new PlaceBookmarkException(BOOKMARK_ALREADY_EXIST);
         }
 
         UserPlaceLogMapping mapping = new UserPlaceLogMapping(user, placeLog);
@@ -55,7 +55,7 @@ public class PlaceLogBookmarkServiceImpl implements PlaceLogBookmarkService{
         UserPlaceLogMappingId mappingId = new UserPlaceLogMappingId(userId, placeLogId);
 
         if (!userPlaceLogMappingRepository.existsById(mappingId)) {
-            throw new BookmarkException(BOOKMARK_ALREADY_REMOVED);
+            throw new PlaceBookmarkException(BOOKMARK_ALREADY_REMOVED);
         }
 
         UserPlaceLogMapping mapping = new UserPlaceLogMapping(user, placeLog);

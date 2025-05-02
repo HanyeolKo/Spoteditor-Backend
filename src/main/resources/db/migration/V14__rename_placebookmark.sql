@@ -1,0 +1,1 @@
+RENAME TABLE boormark TO place_bookmark;
