@@ -37,7 +37,7 @@ public class PlaceLogSearchController {
             @RequestParam(defaultValue = "RECENT") PlaceLogSortType sort
             ) {
 
-        CustomPageResponse<PlaceLogListResponse> response = placeLogRepository.searchBySidoBname(pageRequest, sido, bname);
+        CustomPageResponse<PlaceLogListResponse> response = placeLogSearchService.searchPlaceLogAtAddress(sido, bname, sort, pageRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

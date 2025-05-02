@@ -307,18 +307,27 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
         if (ids.isEmpty()) return null;
 
         // 결과를 메모리 정렬로 보장
-        List<PlaceLogListResponse> unordered = queryFactory
+        List<PlaceLogListResponse> placeLogList = queryFactory
                 .select(Projections.constructor(PlaceLogListResponse.class,
-                                placeLog.id,
-                                placeLog.user.name,
-                                placeLog.name)
-                )
+                        placeLog.id,
+                        placeLog.user.name,
+                        placeLog.name,
+                        Projections.constructor(PlaceImageResponse.class,
+                                placeImage.id,
+                                placeImage.originalFile,
+                                placeImage.storedFile
+                        ),
+                        placeLog.address,
+                        placeLog.views
+                ))
                 .from(placeLog)
                 .where(placeLog.id.in(ids))
+                .leftJoin(placeLog.placeLogImage, placeImage)
+                .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
                 .fetch();
 
         // ID 순서 보존 정렬
-        Map<Long, PlaceLogListResponse> placeLogMap = unordered.stream()
+        Map<Long, PlaceLogListResponse> placeLogMap = placeLogList.stream()
                 .collect(Collectors.toMap(PlaceLogListResponse::placeLogId, Function.identity()));
 
         return ids.stream()

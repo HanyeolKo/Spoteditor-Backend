@@ -10,7 +10,6 @@ public record PlaceLogListResponse (
         String name,
         PlaceImageResponse image,
         Address address,
-        long views,
-        float popularityScore
+        long views
 ) {
 }
