@@ -16,11 +16,12 @@ public class PopularityScheduler {
     /**
      * 전체 게시글의 인기도 갱신
      */
-    @Scheduled(fixedRate = 5 * 60 * 1000)   // 5분
+    @Scheduled(fixedRate = 10 * 60 * 1000)   // 10분
     public void updatePopularity(){
         log.info("로그 인기도 갱신중...");
 
-        placeLogPopularityService.updateAllLogPopularity(500);
+        //placeLogPopularityService.updateAllLogPopularity(500);
+        placeLogPopularityService.updatePopularityScoreOnRedis();
 
         log.info("로그 인기도 갱신 완료.");
     }

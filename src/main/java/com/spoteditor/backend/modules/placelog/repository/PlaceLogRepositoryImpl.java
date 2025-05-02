@@ -19,6 +19,10 @@ import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.spoteditor.backend.modules.bookmark.entity.QBookmark.bookmark;
 import static com.spoteditor.backend.modules.image.entity.QPlaceImage.placeImage;
@@ -46,8 +50,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                             placeImage.storedFile
                         ),
                         placeLog.address,
-                        placeLog.views,
-                        placeLog.popularityScore
+                        placeLog.views
                 ))
                 .from(placeLog)
                 .leftJoin(placeLog.placeLogImage, placeImage)
@@ -85,8 +88,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                                 placeImage.storedFile
                         ),
                         placeLog.address,
-                        placeLog.views,
-                        placeLog.popularityScore
+                        placeLog.views
                 ))
                 .from(placeLog)
                 .leftJoin(placeLog.placeLogImage, placeImage)
@@ -125,8 +127,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                                 placeImage.storedFile
                         ),
                         placeLog.address,
-                        placeLog.views,
-                        placeLog.popularityScore
+                        placeLog.views
                 ))
                 .from(placeLog)
                 .leftJoin(placeLog.placeLogImage, placeImage)
@@ -167,8 +168,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                                 placeImage.storedFile
                         ),
                         placeLog.address,
-                        placeLog.views,
-                        placeLog.popularityScore
+                        placeLog.views
                 ))
                 .from(userPlaceLogMapping)
                 .join(userPlaceLogMapping.placeLog, placeLog)
@@ -194,7 +194,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
     }
 
     @Override
-    public CustomPageResponse<PlaceLogListResponse> searchBySidoBname(CustomPageRequest request, String sido, String bname, PlaceLogSortType sort) {
+    public CustomPageResponse<PlaceLogListResponse> searchBySidoBname(CustomPageRequest request, String sido, String bname) {
         PageRequest pageRequest = request.of();
 
         List<PlaceLogListResponse> placeLogList = queryFactory
@@ -208,8 +208,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                                 placeImage.storedFile
                         ),
                         placeLog.address,
-                        placeLog.views,
-                        placeLog.popularityScore
+                        placeLog.views
                 ))
                 .from(placeLog)
                 .leftJoin(placeLog.placeLogImage, placeImage)
@@ -218,7 +217,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                 .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
-                .orderBy(sort.getOrderSpecifier(request.getDirection()))
+                .orderBy(placeLog.createdAt.desc())
                 .fetch();
 
         JPAQuery<Long> queryCount = queryFactory
@@ -238,7 +237,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
     }
 
     @Override
-    public CustomPageResponse<PlaceLogListResponse> searchByName(CustomPageRequest request, String name, PlaceLogSortType sort) {
+    public CustomPageResponse<PlaceLogListResponse> searchByName(CustomPageRequest request, String name) {
         PageRequest pageRequest = request.of();
 
         BooleanBuilder searchCondition = new BooleanBuilder()
@@ -257,8 +256,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                                 placeImage.storedFile
                         ),
                         placeLog.address,
-                        placeLog.views,
-                        placeLog.popularityScore
+                        placeLog.views
                 ))
                 .from(placeLog)
                 .leftJoin(placeLog.placeLogImage, placeImage)
@@ -266,7 +264,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                 .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
-                .orderBy(sort.getOrderSpecifier(request.getDirection()))
+                .orderBy(placeLog.createdAt.desc())
                 .fetch();
 
         JPAQuery<Long> queryCount = queryFactory
@@ -302,5 +300,30 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                 .offset(offset)
                 .limit(limit)
                 .fetch();
+    }
+
+    @Override
+    public List<PlaceLogListResponse> findByIdInPreserveOrder(List<Long> ids) {
+        if (ids.isEmpty()) return null;
+
+        // 결과를 메모리 정렬로 보장
+        List<PlaceLogListResponse> unordered = queryFactory
+                .select(Projections.constructor(PlaceLogListResponse.class,
+                                placeLog.id,
+                                placeLog.user.name,
+                                placeLog.name)
+                )
+                .from(placeLog)
+                .where(placeLog.id.in(ids))
+                .fetch();
+
+        // ID 순서 보존 정렬
+        Map<Long, PlaceLogListResponse> placeLogMap = unordered.stream()
+                .collect(Collectors.toMap(PlaceLogListResponse::placeLogId, Function.identity()));
+
+        return ids.stream()
+                .map(placeLogMap::get)
+                .filter(Objects::nonNull)
+                .toList();
     }
 }

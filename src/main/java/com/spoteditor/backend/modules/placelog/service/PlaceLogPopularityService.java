@@ -4,6 +4,8 @@ import com.spoteditor.backend.modules.placelog.entity.PlaceLog;
 import com.spoteditor.backend.modules.placelog.repository.PlaceLogRepository;
 import com.spoteditor.backend.modules.placelog.service.dto.PlaceLogWithBookmark;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,8 @@ public class PlaceLogPopularityService {
 
     private final PlaceLogRepository placeRepository;
     private final PlaceLogRepository placeLogRepository;
+
+    private final PlaceLogPopularityRedisService placeLogPopularityRedisService;
 
     /**
      * 인기도 스코어 게산
@@ -47,6 +51,7 @@ public class PlaceLogPopularityService {
         return this.calculatePopulateScore(view, bookmark, date, 1.5f);
     }
 
+    // 다시 사용할 여지가 있어 지우지 않고 남겨둠
     /**
      * 전체 로그 게시물의 인기도를 산정하여 업데이트
      * @param loadPerLogCount   한번에 처리할 로그 게시물 갯수(페이징)
@@ -70,9 +75,20 @@ public class PlaceLogPopularityService {
                 PlaceLog placeLog = placeLogRepository.findById(placeLogWithBookmark.placeLogId()).orElseThrow(
                         () -> new RuntimeException("인기도 업데이트중 찾을 수 없는 로그를 발견했습니다. ID = " + placeLogWithBookmark.placeLogId())
                 );
-                placeLog.setPopularityScore(popularityScore);
+                //placeLog.setPopularityScore(popularityScore);     // 해당컬럼 삭제됨
             }
             page++;
         }
+    }
+
+    public void updatePopularityScoreOnRedis(){
+
+        // 게시글 전체 조회
+        List<PlaceLogWithBookmark> placeLogWithBookmarks = placeRepository.findPlaceLogWithBookmarkCount(Integer.MAX_VALUE, 0);
+
+        placeLogWithBookmarks.forEach(l -> {
+            float popularityScore = calculatePopulateScore(l.viewCount(), l.bookmarkCount(), l.createAt());
+            placeLogPopularityRedisService.updatePopulatorScore(l.placeLogId(), popularityScore);
+        });
     }
 }

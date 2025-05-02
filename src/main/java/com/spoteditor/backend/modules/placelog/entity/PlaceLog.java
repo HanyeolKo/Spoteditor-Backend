@@ -60,9 +60,6 @@ public class PlaceLog extends BaseEntity {
     @Column(name = "status", nullable = false)
     private PlaceLogStatus status;
 
-    @Column(name = "popularity_score")
-    private float popularityScore;
-
     @Version
     private Long version;
 

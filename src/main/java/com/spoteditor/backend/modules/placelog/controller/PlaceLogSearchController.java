@@ -6,14 +6,20 @@ import com.spoteditor.backend.global.exception.PlaceLogException;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogListResponse;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogSortType;
 import com.spoteditor.backend.modules.placelog.repository.PlaceLogRepository;
+import com.spoteditor.backend.modules.placelog.service.PlaceLogSearchService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static com.spoteditor.backend.global.response.ErrorCode.INVALID_TYPE_VALUE;
 import static com.spoteditor.backend.modules.placelog.entity.QPlaceLog.placeLog;
+import static org.springframework.data.support.PageableExecutionUtils.getPage;
 
 @RestController
 @RequestMapping("/api")
@@ -21,6 +27,7 @@ import static com.spoteditor.backend.modules.placelog.entity.QPlaceLog.placeLog;
 public class PlaceLogSearchController {
 
     private final PlaceLogRepository placeLogRepository;
+    private final PlaceLogSearchService placeLogSearchService;
 
     @GetMapping("/search/placelogs/address")
     public ResponseEntity<CustomPageResponse<?>> getPlaceLogsByAddress(
@@ -30,9 +37,7 @@ public class PlaceLogSearchController {
             @RequestParam(defaultValue = "RECENT") PlaceLogSortType sort
             ) {
 
-        pageRequest.setSortProperty(sort.getColumnName());
-
-        CustomPageResponse<PlaceLogListResponse> response = placeLogRepository.searchBySidoBname(pageRequest, sido, bname, sort);
+        CustomPageResponse<PlaceLogListResponse> response = placeLogRepository.searchBySidoBname(pageRequest, sido, bname);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -50,7 +55,7 @@ public class PlaceLogSearchController {
             throw new PlaceLogException(INVALID_TYPE_VALUE);
         }
 
-        CustomPageResponse<PlaceLogListResponse> response = placeLogRepository.searchByName(pageRequest, searchName, sort);
+        CustomPageResponse<PlaceLogListResponse> response = placeLogSearchService.searchPlaceLogAtName(name, sort, pageRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -61,14 +66,20 @@ public class PlaceLogSearchController {
     public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByPopularity(
             @ModelAttribute CustomPageRequest request
     ){
-        // 인기도순 강제정렬
-        // 서비스 로직으로 분리하는게 명확하긴한데...
         PlaceLogSortType sortType = PlaceLogSortType.POPULARITY;
-        request.setSortProperty(sortType.getColumnName());
 
-        CustomPageResponse<PlaceLogListResponse> response = placeLogRepository.findAllPlace(request, sortType.getOrderSpecifier(request.getDirection()));
+        request.setSortProperty(sortType.name());
+        request.setPage(0);
+
+        List<PlaceLogListResponse> placeLogOrderPopularity = placeLogSearchService.popularityPlaceLog(request.getSize());
+
+        Page<PlaceLogListResponse> response = PageableExecutionUtils.getPage(
+                placeLogOrderPopularity,
+                request.of(),
+                placeLogOrderPopularity::size
+        );
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(response);
+                .body(new CustomPageResponse<>(response));
     }
 }
