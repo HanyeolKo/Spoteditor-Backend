@@ -16,7 +16,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @Table(name = "place_log")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PlaceLog extends BaseEntity {
