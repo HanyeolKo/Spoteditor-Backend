@@ -1,10 +1,10 @@
 package com.spoteditor.backend.modules.placelog.service;
 
 import com.spoteditor.backend.modules.placelog.entity.PlaceLog;
+import com.spoteditor.backend.modules.placelog.repository.PlaceLogPopularityRedisRepository;
 import com.spoteditor.backend.modules.placelog.repository.PlaceLogRepository;
 import com.spoteditor.backend.modules.placelog.service.dto.PlaceLogWithBookmark;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +20,7 @@ public class PlaceLogPopularityService {
     private final PlaceLogRepository placeRepository;
     private final PlaceLogRepository placeLogRepository;
 
-    private final PlaceLogPopularityRedisService placeLogPopularityRedisService;
+    private final PlaceLogPopularityRedisRepository placeLogPopularityRedisRepository;
 
     /**
      * 인기도 스코어 게산
@@ -89,7 +89,7 @@ public class PlaceLogPopularityService {
 
         placeLogWithBookmarks.forEach(l -> {
             float popularityScore = calculatePopulateScore(l.viewCount(), l.bookmarkCount(), l.createAt());
-            placeLogPopularityRedisService.updatePopulatorScore(l.placeLogId(), popularityScore);
+            placeLogPopularityRedisRepository.updatePopulatorScore(l.placeLogId(), popularityScore);
         });
     }
 }

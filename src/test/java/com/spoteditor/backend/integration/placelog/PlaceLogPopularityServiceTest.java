@@ -3,11 +3,9 @@ package com.spoteditor.backend.integration.placelog;
 import com.spoteditor.backend.config.RedisTestConfiguration;
 import com.spoteditor.backend.config.jwt.repository.RefreshTokenRepository;
 import com.spoteditor.backend.global.entity.BaseEntity;
-import com.spoteditor.backend.global.exception.PlaceLogException;
 import com.spoteditor.backend.modules.placelog.entity.PlaceLog;
-import com.spoteditor.backend.modules.placelog.entity.PlaceLogStatus;
 import com.spoteditor.backend.modules.placelog.repository.PlaceLogRepository;
-import com.spoteditor.backend.modules.placelog.service.PlaceLogPopularityRedisService;
+import com.spoteditor.backend.modules.placelog.repository.PlaceLogPopularityRedisRepository;
 import com.spoteditor.backend.modules.placelog.service.PlaceLogPopularityService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +34,7 @@ public class PlaceLogPopularityServiceTest {
     private PlaceLogPopularityService placeLogPopularityService;
 
     @Autowired
-    private PlaceLogPopularityRedisService placeLogPopularityRedisService;
+    private PlaceLogPopularityRedisRepository placeLogPopularityRedisRepository;
 
 
     // 테스트용 MockBean 주입
@@ -85,7 +83,7 @@ public class PlaceLogPopularityServiceTest {
         });
 
         System.out.println("인기순 출력 ㄱ");
-        placeLogPopularityRedisService.getAllPopularityList().forEach(System.out::println);
+        placeLogPopularityRedisRepository.getAllPopularityList().forEach(System.out::println);
 
 
     }

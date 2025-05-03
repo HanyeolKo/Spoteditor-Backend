@@ -4,12 +4,10 @@ import com.spoteditor.backend.global.page.CustomPageRequest;
 import com.spoteditor.backend.global.page.CustomPageResponse;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogListResponse;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogSortType;
-import com.spoteditor.backend.modules.placelog.entity.PlaceLog;
+import com.spoteditor.backend.modules.placelog.repository.PlaceLogPopularityRedisRepository;
 import com.spoteditor.backend.modules.placelog.repository.PlaceLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +24,7 @@ import static java.util.Arrays.stream;
 public class PlaceLogSearchService {
 
     private final PlaceLogRepository placeLogRepository;
-    private final PlaceLogPopularityRedisService placeLogPopularityRedisService;
+    private final PlaceLogPopularityRedisRepository placeLogPopularityRedisRepository;
 
     /**
      * 주소 검색
@@ -82,7 +80,7 @@ public class PlaceLogSearchService {
     public List<PlaceLogListResponse> popularityPlaceLog(int top){
 
         // 1. Redis Sorted Set에서 상위 N개의 ID를 읽어옴
-        List<Long> topIds = placeLogPopularityRedisService.getPopularityList(top);
+        List<Long> topIds = placeLogPopularityRedisRepository.getPopularityList(top);
 
         // 2. DB에서 해당 ID 들을 조회 (redis에서 가져온 순서 유지)
         List<PlaceLogListResponse> placeLogs = placeLogRepository.findByIdInPreserveOrder(topIds);
@@ -97,7 +95,7 @@ public class PlaceLogSearchService {
      * @return
      */
     public List<PlaceLogListResponse> placeLogReOrderPopularity(CustomPageResponse<PlaceLogListResponse> searchDataOrderByRecent){
-        List<Long> popularityList = placeLogPopularityRedisService.getAllPopularityList();
+        List<Long> popularityList = placeLogPopularityRedisRepository.getAllPopularityList();
 
         List<PlaceLogListResponse> placeLogList = searchDataOrderByRecent.getContent();
 

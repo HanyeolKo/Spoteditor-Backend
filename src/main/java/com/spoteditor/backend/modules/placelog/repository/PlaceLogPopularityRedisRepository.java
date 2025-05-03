@@ -1,4 +1,4 @@
-package com.spoteditor.backend.modules.placelog.service;
+package com.spoteditor.backend.modules.placelog.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -10,7 +10,7 @@ import static com.spoteditor.backend.modules.placelog.constants.RedisKey.PLACELO
 
 @Service
 @RequiredArgsConstructor
-public class PlaceLogPopularityRedisService {
+public class PlaceLogPopularityRedisRepository {
 
     private final StringRedisTemplate stringRedisTemplate;
 
