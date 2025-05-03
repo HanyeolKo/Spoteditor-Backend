@@ -31,7 +31,7 @@ public class PlaceLogSearchController {
 
     @GetMapping("/search/placelogs/address")
     public ResponseEntity<CustomPageResponse<?>> getPlaceLogsByAddress(
-            @ModelAttribute CustomPageRequest pageRequest,
+            @RequestParam CustomPageRequest pageRequest,
             @RequestParam String sido,
             @RequestParam String bname,
             @RequestParam(defaultValue = "RECENT") PlaceLogSortType sort
@@ -46,7 +46,7 @@ public class PlaceLogSearchController {
 
     @GetMapping("/search/placelogs/name")
     public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByName(
-            @ModelAttribute CustomPageRequest pageRequest,
+            @RequestParam CustomPageRequest pageRequest,
             @RequestParam String name,
             @RequestParam(defaultValue = "RECENT") PlaceLogSortType sort
     ) {
@@ -64,18 +64,18 @@ public class PlaceLogSearchController {
 
     @GetMapping("/placelogs/popularity")
     public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByPopularity(
-            @ModelAttribute CustomPageRequest request
+            @RequestParam CustomPageRequest pageRequest
     ){
         PlaceLogSortType sortType = PlaceLogSortType.POPULARITY;
 
-        request.setSortProperty(sortType.name());
-        request.setPage(0);
+        pageRequest.setSortProperty(sortType.name());
+        pageRequest.setPage(0);
 
-        List<PlaceLogListResponse> placeLogOrderPopularity = placeLogSearchService.popularityPlaceLog(request.getSize());
+        List<PlaceLogListResponse> placeLogOrderPopularity = placeLogSearchService.popularityPlaceLog(pageRequest.getSize());
 
         Page<PlaceLogListResponse> response = PageableExecutionUtils.getPage(
                 placeLogOrderPopularity,
-                request.of(),
+                pageRequest.of(),
                 placeLogOrderPopularity::size
         );
 
