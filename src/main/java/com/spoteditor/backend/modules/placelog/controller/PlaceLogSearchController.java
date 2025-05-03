@@ -1,25 +1,21 @@
 package com.spoteditor.backend.modules.placelog.controller;
 
+import com.spoteditor.backend.global.exception.PlaceLogException;
 import com.spoteditor.backend.global.page.CustomPageRequest;
 import com.spoteditor.backend.global.page.CustomPageResponse;
-import com.spoteditor.backend.global.exception.PlaceLogException;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogListResponse;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogSortType;
 import com.spoteditor.backend.modules.placelog.repository.PlaceLogRepository;
 import com.spoteditor.backend.modules.placelog.service.PlaceLogSearchService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import static com.spoteditor.backend.global.response.ErrorCode.INVALID_TYPE_VALUE;
-import static com.spoteditor.backend.modules.placelog.entity.QPlaceLog.placeLog;
-import static org.springframework.data.support.PageableExecutionUtils.getPage;
 
 @RestController
 @RequestMapping("/api")
@@ -63,23 +59,13 @@ public class PlaceLogSearchController {
     }
 
     @GetMapping("/placelogs/popularity")
-    public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByPopularity(
+    public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByPagingPopularity(
             @RequestParam CustomPageRequest pageRequest
-    ){
-        PlaceLogSortType sortType = PlaceLogSortType.POPULARITY;
+    ) {
+        CustomPageResponse<PlaceLogListResponse> response = placeLogSearchService.popularityPagingPlaceLog(pageRequest);
 
-        pageRequest.setSortProperty(sortType.name());
-        pageRequest.setPage(0);
-
-        List<PlaceLogListResponse> placeLogOrderPopularity = placeLogSearchService.popularityPlaceLog(pageRequest.getSize());
-
-        Page<PlaceLogListResponse> response = PageableExecutionUtils.getPage(
-                placeLogOrderPopularity,
-                pageRequest.of(),
-                placeLogOrderPopularity::size
-        );
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new CustomPageResponse<>(response));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
     }
 }

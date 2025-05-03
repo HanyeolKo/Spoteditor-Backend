@@ -14,6 +14,7 @@ import com.spoteditor.backend.modules.placelog.service.dto.PlaceLogWithBookmark;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
@@ -282,6 +283,61 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
     }
 
     @Override
+    public List<PlaceLogListResponse> searchAllBySidoBname(String sido, String bname) {
+        List<PlaceLogListResponse> placeLogList = queryFactory
+                .select(Projections.constructor(PlaceLogListResponse.class,
+                        placeLog.id,
+                        placeLog.user.name,
+                        placeLog.name,
+                        Projections.constructor(PlaceImageResponse.class,
+                                placeImage.id,
+                                placeImage.originalFile,
+                                placeImage.storedFile
+                        ),
+                        placeLog.address,
+                        placeLog.views
+                ))
+                .from(placeLog)
+                .leftJoin(placeLog.placeLogImage, placeImage)
+                .where(placeLog.address.sido.eq(sido))
+                .where(placeLog.address.bname.eq(bname))
+                .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
+                .fetch();
+
+        return placeLogList;
+    }
+
+    @Override
+    public List<PlaceLogListResponse> searchAllByName(String name) {
+
+        BooleanBuilder searchCondition = new BooleanBuilder()
+                .or(placeLog.name.contains(name))
+                .or(placeLog.address.bname.contains(name))
+                .or(placeLog.address.sido.contains(name));
+
+        List<PlaceLogListResponse> placeLogList = queryFactory
+                .select(Projections.constructor(PlaceLogListResponse.class,
+                        placeLog.id,
+                        placeLog.user.name,
+                        placeLog.name,
+                        Projections.constructor(PlaceImageResponse.class,
+                                placeImage.id,
+                                placeImage.originalFile,
+                                placeImage.storedFile
+                        ),
+                        placeLog.address,
+                        placeLog.views
+                ))
+                .from(placeLog)
+                .leftJoin(placeLog.placeLogImage, placeImage)
+                .where(searchCondition)
+                .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
+                .fetch();
+
+        return placeLogList;
+    }
+
+    @Override
     public List<PlaceLogWithBookmark> findPlaceLogWithBookmarkCount(int limit, int offset) {
 
         return queryFactory
@@ -329,9 +385,11 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
         Map<Long, PlaceLogListResponse> placeLogMap = placeLogList.stream()
                 .collect(Collectors.toMap(PlaceLogListResponse::placeLogId, Function.identity()));
 
-        return ids.stream()
+        List<PlaceLogListResponse> contents = ids.stream()
                 .map(placeLogMap::get)
                 .filter(Objects::nonNull)
                 .toList();
+
+        return contents;
     }
 }

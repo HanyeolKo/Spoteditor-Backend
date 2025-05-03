@@ -25,6 +25,10 @@ public interface PlaceLogRepositoryCustom {
 
     CustomPageResponse<PlaceLogListResponse> searchByName(CustomPageRequest pageRequest, String name);
 
+    List<PlaceLogListResponse> searchAllBySidoBname(String sido, String bname);
+
+    List<PlaceLogListResponse> searchAllByName(String name);
+
     List<PlaceLogWithBookmark> findPlaceLogWithBookmarkCount(int limit, int offset);
 
     List<PlaceLogListResponse> findByIdInPreserveOrder(List<Long> ids);
