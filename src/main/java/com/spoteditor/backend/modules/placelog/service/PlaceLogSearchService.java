@@ -44,7 +44,7 @@ public class PlaceLogSearchService {
 
         CustomPageResponse<PlaceLogListResponse> response;
 
-        if(sortType.equals(PlaceLogSortType.POPULARITY)){
+        if(sortType.equals(PlaceLogSortType.POPULARITY)){       //인기순 정렬
             List<PlaceLogListResponse> searchDataAfterSort = placeLogReOrderPopularity(placeLogRepository.searchAllBySidoBname(sido, gugun));
 
             List<PlaceLogListResponse> contents = pagingOnSearchData(pageRequest, searchDataAfterSort);
@@ -56,7 +56,7 @@ public class PlaceLogSearchService {
             );
 
             return new CustomPageResponse<>(p);
-        }else{
+        }else{          //그외 (최신순)
             response = placeLogRepository.searchBySidoBname(pageRequest, sido, gugun);
         }
 
@@ -111,7 +111,7 @@ public class PlaceLogSearchService {
      */
     public CustomPageResponse<PlaceLogListResponse> popularityPagingPlaceLog(CustomPageRequest pageRequest) {
 
-        // 1. Redis Sorted Set에서 상위 N개의 ID를 읽어옴
+        // 1. Redis Sorted Set에서 전체 게시글의 ID를 읽어옴
         List<Long> topIds = placeLogPopularityRedisRepository.getAllPopularityList();
 
         // 2. DB에서 해당 ID 들을 조회 (redis에서 가져온 순서 유지)
