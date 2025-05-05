@@ -4,30 +4,16 @@ import com.spoteditor.backend.config.RedisTestConfiguration;
 import com.spoteditor.backend.config.TestJwtFilter;
 import com.spoteditor.backend.config.TestSecurityConfig;
 import com.spoteditor.backend.config.jwt.repository.RefreshTokenRepository;
-import com.spoteditor.backend.global.entity.BaseEntity;
-import com.spoteditor.backend.modules.place.entity.Address;
-import com.spoteditor.backend.modules.placelog.entity.PlaceLog;
-import com.spoteditor.backend.modules.placelog.entity.PlaceLogStatus;
-import com.spoteditor.backend.modules.placelog.repository.PlaceLogRepository;
-import com.spoteditor.backend.modules.placelog.service.PlaceLogPopularityService;
-import com.spoteditor.backend.modules.user.entity.User;
-import com.spoteditor.backend.modules.user.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.lang.reflect.Field;
-import java.time.LocalDateTime;
 import java.util.Random;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -128,7 +114,17 @@ public class search {
     @Test
     @DisplayName("인기도순 검색")
     void search_popularity() throws Exception {
-        mock.perform(get("/api/placelogs/popularity"))
+        mock.perform(get("/api/placelogs/popularity")
+                        .queryParam("page","0")
+                        .queryParam("size","12"))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("상위 5개 인기도순 검색")
+    void search_popularityTop() throws Exception {
+        mock.perform(get("/api/placelogs/popularity/5"))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
