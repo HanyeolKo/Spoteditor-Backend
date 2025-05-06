@@ -1,5 +1,7 @@
 package com.spoteditor.backend.modules.placelog.repository;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -8,16 +10,23 @@ import com.spoteditor.backend.global.page.CustomPageResponse;
 import com.spoteditor.backend.modules.image.controller.dto.PlaceImageResponse;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogListResponse;
 import com.spoteditor.backend.modules.placelog.entity.PlaceLogStatus;
+import com.spoteditor.backend.modules.placelog.service.dto.PlaceLogWithBookmark;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.spoteditor.backend.modules.image.entity.QPlaceImage.placeImage;
 import static com.spoteditor.backend.modules.mapping.userplacelogmapping.entity.QUserPlaceLogMapping.userPlaceLogMapping;
+import static com.spoteditor.backend.modules.placebookmark.entity.QPlaceBookmark.placeBookmark;
 import static com.spoteditor.backend.modules.placelog.entity.QPlaceLog.placeLog;
 
 @Repository
@@ -27,7 +36,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public CustomPageResponse<PlaceLogListResponse> findAllPlace(CustomPageRequest request) {
+    public CustomPageResponse<PlaceLogListResponse> findAllPlace(CustomPageRequest request, OrderSpecifier<?> orderSpecifier) {
         PageRequest pageRequest = request.of();
 
         List<PlaceLogListResponse> placeLogList = queryFactory
@@ -48,7 +57,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                 .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
-                .orderBy(placeLog.createdAt.desc())
+                .orderBy(orderSpecifier)
                 .fetch();
 
         JPAQuery<Long> queryCount = queryFactory
@@ -231,6 +240,11 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
     public CustomPageResponse<PlaceLogListResponse> searchByName(CustomPageRequest request, String name) {
         PageRequest pageRequest = request.of();
 
+        BooleanBuilder searchCondition = new BooleanBuilder()
+                .or(placeLog.name.contains(name))
+                .or(placeLog.address.bname.contains(name))
+                .or(placeLog.address.sido.contains(name));
+
         List<PlaceLogListResponse> placeLogList = queryFactory
                 .select(Projections.constructor(PlaceLogListResponse.class,
                         placeLog.id,
@@ -246,7 +260,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
                 ))
                 .from(placeLog)
                 .leftJoin(placeLog.placeLogImage, placeImage)
-                .where(placeLog.name.contains(name))
+                .where(searchCondition)
                 .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
                 .offset(pageRequest.getOffset())
                 .limit(pageRequest.getPageSize())
@@ -256,7 +270,7 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
         JPAQuery<Long> queryCount = queryFactory
                 .select(placeLog.count())
                 .from(placeLog)
-                .where(placeLog.name.contains(name))
+                .where(searchCondition)
                 .where(placeLog.status.eq(PlaceLogStatus.PUBLIC));
 
         Page<PlaceLogListResponse> page = PageableExecutionUtils.getPage(
@@ -266,5 +280,116 @@ public class PlaceLogRepositoryImpl implements PlaceLogRepositoryCustom {
         );
 
         return new CustomPageResponse<>(page);
+    }
+
+    @Override
+    public List<PlaceLogListResponse> searchAllBySidoBname(String sido, String bname) {
+        List<PlaceLogListResponse> placeLogList = queryFactory
+                .select(Projections.constructor(PlaceLogListResponse.class,
+                        placeLog.id,
+                        placeLog.user.name,
+                        placeLog.name,
+                        Projections.constructor(PlaceImageResponse.class,
+                                placeImage.id,
+                                placeImage.originalFile,
+                                placeImage.storedFile
+                        ),
+                        placeLog.address,
+                        placeLog.views
+                ))
+                .from(placeLog)
+                .leftJoin(placeLog.placeLogImage, placeImage)
+                .where(placeLog.address.sido.eq(sido))
+                .where(placeLog.address.bname.eq(bname))
+                .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
+                .fetch();
+
+        return placeLogList;
+    }
+
+    @Override
+    public List<PlaceLogListResponse> searchAllByName(String name) {
+
+        BooleanBuilder searchCondition = new BooleanBuilder()
+                .or(placeLog.name.contains(name))
+                .or(placeLog.address.bname.contains(name))
+                .or(placeLog.address.sido.contains(name));
+
+        List<PlaceLogListResponse> placeLogList = queryFactory
+                .select(Projections.constructor(PlaceLogListResponse.class,
+                        placeLog.id,
+                        placeLog.user.name,
+                        placeLog.name,
+                        Projections.constructor(PlaceImageResponse.class,
+                                placeImage.id,
+                                placeImage.originalFile,
+                                placeImage.storedFile
+                        ),
+                        placeLog.address,
+                        placeLog.views
+                ))
+                .from(placeLog)
+                .leftJoin(placeLog.placeLogImage, placeImage)
+                .where(searchCondition)
+                .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
+                .fetch();
+
+        return placeLogList;
+    }
+
+    @Override
+    public List<PlaceLogWithBookmark> findPlaceLogWithBookmarkCount(int limit, int offset) {
+
+        return queryFactory
+                .select(Projections.constructor(
+                        PlaceLogWithBookmark.class,
+                        placeLog.id,
+                        placeLog.views,
+                        placeLog.createdAt,
+                        placeBookmark.id.countDistinct()
+                ))
+                .from(placeLog)
+                .leftJoin(placeBookmark).on(placeBookmark.place.id.eq(placeLog.id))
+                .groupBy(placeLog.id)
+                .orderBy(placeLog.id.asc())
+                .offset(offset)
+                .limit(limit)
+                .fetch();
+    }
+
+    @Override
+    public List<PlaceLogListResponse> findByIdInPreserveOrder(List<Long> ids) {
+        if (ids.isEmpty()) return null;
+
+        // 결과를 메모리 정렬로 보장
+        List<PlaceLogListResponse> placeLogList = queryFactory
+                .select(Projections.constructor(PlaceLogListResponse.class,
+                        placeLog.id,
+                        placeLog.user.name,
+                        placeLog.name,
+                        Projections.constructor(PlaceImageResponse.class,
+                                placeImage.id,
+                                placeImage.originalFile,
+                                placeImage.storedFile
+                        ),
+                        placeLog.address,
+                        placeLog.views
+                ))
+                .from(placeLog)
+                .where(placeLog.id.in(ids))
+                .leftJoin(placeLog.placeLogImage, placeImage)
+                .where(placeLog.status.eq(PlaceLogStatus.PUBLIC))
+                .fetch();
+
+        // ID 순서 보존 정렬
+        Map<Long, PlaceLogListResponse> placeLogMap = placeLogList.stream()
+                .collect(Collectors.toMap(PlaceLogListResponse::placeLogId, Function.identity()));
+
+        List<PlaceLogListResponse> contents = ids.stream()
+                .map(placeLogMap::get)
+                .filter(Objects::nonNull)
+                .toList();
+
+        return contents;
     }
 }

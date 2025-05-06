@@ -2,6 +2,7 @@ package com.spoteditor.backend.modules.placelog.controller.dto;
 
 import com.spoteditor.backend.modules.image.controller.dto.PlaceImageResponse;
 import com.spoteditor.backend.modules.place.entity.Address;
+import lombok.Getter;
 
 public record PlaceLogListResponse (
         Long placeLogId,

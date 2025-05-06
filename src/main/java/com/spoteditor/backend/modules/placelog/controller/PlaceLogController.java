@@ -21,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import static com.spoteditor.backend.modules.placelog.entity.QPlaceLog.placeLog;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -51,7 +53,7 @@ public class PlaceLogController implements PlaceLogApiDocument {
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(placeLogRepository.findAllPlace(pageRequest));
+                .body(placeLogRepository.findAllPlace(pageRequest, placeLog.createdAt.desc()));
     }
 
     @Override

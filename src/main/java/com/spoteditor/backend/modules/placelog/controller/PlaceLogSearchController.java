@@ -4,13 +4,23 @@ import com.spoteditor.backend.global.page.CustomPageRequest;
 import com.spoteditor.backend.global.page.CustomPageResponse;
 import com.spoteditor.backend.global.exception.PlaceLogException;
 import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogListResponse;
+import com.spoteditor.backend.modules.placelog.controller.dto.PlaceLogSortType;
 import com.spoteditor.backend.modules.placelog.repository.PlaceLogRepository;
+import com.spoteditor.backend.modules.placelog.service.PlaceLogSearchService;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static com.spoteditor.backend.global.response.ErrorCode.INVALID_TYPE_VALUE;
+import static com.spoteditor.backend.modules.placelog.entity.QPlaceLog.placeLog;
+import static org.springframework.data.support.PageableExecutionUtils.getPage;
 
 @RestController
 @RequestMapping("/api")
@@ -18,30 +28,58 @@ import static com.spoteditor.backend.global.response.ErrorCode.INVALID_TYPE_VALU
 public class PlaceLogSearchController {
 
     private final PlaceLogRepository placeLogRepository;
+    private final PlaceLogSearchService placeLogSearchService;
 
     @GetMapping("/search/placelogs/address")
-    public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByAddress(
-            CustomPageRequest pageRequest,
-            String sido,
-            String bname
-    ) {
+    public ResponseEntity<CustomPageResponse<?>> getPlaceLogsByAddress(
+            @ModelAttribute CustomPageRequest pageRequest,
+            @RequestParam String sido,
+            @RequestParam String bname,
+            @RequestParam(defaultValue = "RECENT") PlaceLogSortType sort
+            ) {
+
+        CustomPageResponse<PlaceLogListResponse> response = placeLogSearchService.searchPlaceLogAtAddress(sido, bname, sort, pageRequest);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(placeLogRepository.searchBySidoBname(pageRequest, sido, bname));
+                .body(response);
     }
 
     @GetMapping("/search/placelogs/name")
     public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByName(
-            CustomPageRequest pageRequest,
-            String name
+            @ModelAttribute CustomPageRequest pageRequest,
+            @RequestParam String name,
+            @RequestParam(defaultValue = "RECENT") PlaceLogSortType sort
     ) {
         String searchName = name.trim();
         if(searchName.length() < 2) {
             throw new PlaceLogException(INVALID_TYPE_VALUE);
         }
 
+        CustomPageResponse<PlaceLogListResponse> response = placeLogSearchService.searchPlaceLogAtName(name, sort, pageRequest);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(placeLogRepository.searchByName(pageRequest, searchName));
+                .body(response);
+    }
+
+    @GetMapping("/placelogs/popularity")
+    public ResponseEntity<CustomPageResponse<PlaceLogListResponse>> getPlaceLogsByPagingPopularity(
+            @ModelAttribute CustomPageRequest pageRequest
+    ) {
+        CustomPageResponse<PlaceLogListResponse> response = placeLogSearchService.popularityPagingPlaceLog(pageRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @GetMapping("/placelogs/popularity/{top}")
+    public ResponseEntity<List<PlaceLogListResponse>> getPlaceLogsByPopularity(@PathVariable("top") int top){
+
+        List<PlaceLogListResponse> response = placeLogSearchService.popularityPlaceLog(top);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
     }
 }
