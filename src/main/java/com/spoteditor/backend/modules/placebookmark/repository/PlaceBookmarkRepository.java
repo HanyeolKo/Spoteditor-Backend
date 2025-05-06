@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface PlaceBookmarkRepository extends JpaRepository<PlaceBookmark, Long> {
 
 	Optional<PlaceBookmark> findByUserIdAndPlaceId(@Param("userId") Long userId, @Param("placeId") Long placeId);
+
+	@Query("SELECT bookmark.id FROM PlaceBookmark bookmark WHERE bookmark.user.id = :userId")
 	List<Long> findBookmarkedPlaceIdsByUserId(@Param("userId") Long userId);
 
 	@Modifying
