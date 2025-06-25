@@ -1,136 +1,74 @@
-<div align="center">
+# SpotEditor Backend
+Google Map의 평점 시스템과 유사한 지역 기반 소셜 미디어 서비스 플랫폼의 백엔드 API 서버입니다.
 
-# 계획된 코스, 그대로 즐기는 완벽한 하루 스팟에디터
-
-![Image](https://github.com/user-attachments/assets/5a1786ab-fc34-4763-bce9-7bca40499b4b)
-
-[Spoteditor 에서 완벽한 하루 추천받기](https://spoteditor-frontend.vercel.app/)
-
-</div>
-
-## 프로젝트 소개
-
----
-
-낯선 곳을 여행할 때마다 맛집, 액티비티, 주변 명소를 찾느라 한참을 검색하곤 했어요.<br>
-그런데 문득 이런 생각이 들었죠.<br>
-'만약 이 도시를 잘 아는 친구가 내 코스를 계획해준다면?'<br><br>
-이 작은 호기심에서 우리의 이야기가 시작됐어요.
-
-
-## 서비스 화면
-
----
-
-
-
-
-
-## 팀원 소개
-
----
-
-<table>
-  <tr>
-    <td align="center"> 디자인</td>
-    <td align="center"> 프론트엔드</td>
-    <td align="center"> 프론트엔드</td>
-    <td align="center"> 백엔드</td>
-    <td align="center"> 백엔드</td>
-  </tr>
-  <tr>
-    <td align="center" width="120px">
-      <a href="https://github.com/hdj09" target="_blank">
-        <img src="https://avatars.githubusercontent.com/u/193453479?v=4" alt="장다혜 프로필" />
-      </a>
-    </td>
-    <td align="center" width="120px">
-      <a href="https://github.com/rlaugs15" target="_blank">
-        <img src="https://avatars.githubusercontent.com/u/68183848?v=4" alt="김현준 프로필" />
-      </a>
-    </td>
-    <td align="center" width="120px">
-      <a href="https://github.com/hayanLee" target="_blank">
-        <img src="https://avatars.githubusercontent.com/u/164024424?v=4" alt="이하얀 프로필" />
-      </a>
-    </td>
-    <td align="center" width="120px">
-      <a href="https://github.com/dnwls16071" target="_blank">
-        <img src="https://avatars.githubusercontent.com/u/106802375?v=4" alt="장우진 프로필" />
-      </a>
-    </td>
-    <td align="center" width="120px">
-      <a href="https://github.com/ddangahn2" target="_blank">
-        <img src="https://avatars.githubusercontent.com/u/85681261?v=4" alt="한상안 프로필" />
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/hdj09" target="_blank">
-        장다혜
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/rlaugs15" target="_blank">
-        김현준
-      </a>
-    </td> 
-    <td align="center">
-      <a href="https://github.com/hayanLee" target="_blank">
-        이하얀
-      </a>
-    <td align="center">
-      <a href="https://github.com/dnwls16071" target="_blank">
-        장우진
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/ddangahn2" target="_blank">
-        한상안
-      </a>
-    </td>
-  </tr>
-</table>
+## 주요 기능
+- Oauth2.0 기반 회원가입/로그인 (JWT 인증)
+- 사용자 팔로우 및 게시글 좋아요 알림
+- 인기 게시물 상위노출
+- 지역 기반 검색
 
 ## 기술 스택
+- Java 17, Spring Boot 3.x, Spring Security, JPA, QueryDSL, Gradle, Spring Scheduler
+- MySQL, Redis, Redisson, flyway
+- Docker, Docker Compose
+- Swagger, Spring Rest Docs
+- AWS S3, code deploy, GitHub, AWS CLI(On-Premise Server)
+
+## 프로젝트 패키지 구조
+- config : 프로젝트 전역 설정 관련 패키지
+- global : 프로젝트 전역 공통 모듈 관련 패키지
+- infra : 프로젝트 전역 인프라 관련 패키지
+- modules : 도매인 패키지
+
+## 인프라 아키텍처 구성
+
+### 전체 개요
+
+SpotEditor 백엔드는 **온프레미스 환경의 Docker 기반 서버**에서 구동되며, 프론트엔드는 **Vercel**에서 별도로 배포됩니다.  
+이 시스템은 리버스 프록시, 로드 밸런싱, 캐싱 클러스터, 자동화된 CI/CD 파이프라인 등을 포함합니다.
 
 ---
 
-### 언어 & 프레임워크
+### 요청 흐름
 
-<img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white">
-<img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
+1. **클라이언트 요청**
+   - 사용자의 HTTP/HTTPS 요청은 **Nginx 리버스 프록시** 서버를 거칩니다.
+   - **Rate Limit** 설정으로 과도한 요청을 방지합니다.
 
-[//]: # (<img src="https://img.shields.io/badge/springsecurity-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white">)
+2. **프론트엔드**
+   - 프론트는 **Vercel**을 통해 정적으로 배포되어 사용자에게 직접 제공됩니다.
 
-### 데이터베이스
+3. **백엔드 서버**
+   - **Spring Boot 기반 모놀리식 백엔드 서버 2개**를 Docker로 컨테이너화하여 운용
+   - **Nginx를 통한 Round Robin 방식의 로드 밸런싱**으로 트래픽을 분산 처리
+   - 전체 백엔드 환경은 **Docker Compose**로 구성 및 관리
 
-<img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
+4. **Redis 클러스터**
+   - 고가용성을 위한 **Redis Cluster (3 Master + 3 Slave)** 구조 운영
+   - 세션 관리, 캐시 처리 및 작업 큐 등에 활용
 
-### 인프라
-
-<img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white">
-
-[//]: # (<img src="https://img.shields.io/badge/amazonaws-232F3E?style=for-the-badge&logo=amazonwebservices&logoColor=white">)
-
-<img src="https://img.shields.io/badge/amazonec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white">
-<img src="https://img.shields.io/badge/amazonrds-527FFF?style=for-the-badge&logo=amazonrds&logoColor=white">
-<img src="https://img.shields.io/badge/amazons3-569A31?style=for-the-badge&logo=amazons3&logoColor=white">
-<img src="https://img.shields.io/badge/awselb-8C4FFF?style=for-the-badge&logo=awselasticloadbalancing&logoColor=white">
-
-### CI/CD
-
-<img src="https://img.shields.io/badge/githubactions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">
-
-### 협업
-
-<img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
-<img src="https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white">
-
-## 인프라
+5. ##TLS 인증서**
+   - SSL/TLS 인증서는 Let's Encrypt를 통해 1개월에 한번씩 자동갱신
 
 ---
 
-<img src="https://private-user-images.githubusercontent.com/106802375/418778716-0f934fa2-57cb-4715-a0c7-e50e7872c5a8.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDIyMDU1NjUsIm5iZiI6MTc0MjIwNTI2NSwicGF0aCI6Ii8xMDY4MDIzNzUvNDE4Nzc4NzE2LTBmOTM0ZmEyLTU3Y2ItNDcxNS1hMGM3LWU1MGU3ODcyYzVhOC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwMzE3JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDMxN1QwOTU0MjVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT02ZDM5NTk0MDQ4NjNhOGVlMDZmNjBmMTM0YTE0MjA5Y2NhMTM0YTk2NDBmODJkZTc0NTM1M2Y4YzQ4MDY4Yzk4JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.q4g9fHd6ZuiDijBB1RFcMtKydf2z2bdWuL_vqe7XEvQ" alt="인프라">
+### CI/CD 파이프라인
 
+- **CI :**
+  - GitHub Actions를 활용해 커밋 시 테스트 및 빌드 자동 수행
+
+- **CD :**
+  - 빌드 결과물을 **AWS S3에 업로드**
+  - 이후 **CodeDeploy 트리거**가 활성화되어
+  - **온프레미스 환경의 CodeDeploy Agent**가 자동으로 배포 수행
+  - 최종 배포는 **Docker Compose** 환경을 통해 컨테이너 기반으로 적용
+
+---
+
+### 요약
+
+- **수평 확장 가능성 확보**: 2개 백엔드 서버 + 라운드 로빈 로드밸런싱  
+- **과도한 요청 제어**: Nginx + Rate Limit  
+- **배포 자동화**: GitHub → S3 → CodeDeploy → 온프레미스  
+- **고가용성 캐시 시스템**: Redis 클러스터  
+- **모듈화된 관리**: Docker Compose로 전체 환경 통합 관리
