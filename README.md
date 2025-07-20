@@ -1,5 +1,5 @@
 # SpotEditor Backend
-Google Map의 평점 시스템과 유사한 지역 기반 소셜 미디어 서비스 플랫폼의 백엔드 API 서버입니다.
+Google Map의 평점 시스템과 유사한 지역 기반 핫플레이스 추천 서비스 플랫폼의 백엔드 API 서버입니다.
 
 ## 주요 기능
 - Oauth2.0 기반 회원가입/로그인 (JWT 인증)
